@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Data Science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Robert Clements" />
+    <link rel="stylesheet" href="rc_css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Data Science
+## Session 2.2
+### Robert Clements
+
+---
+
+
+
+
+### Session 2.2 Outline
+
+- Composing Data Graphics
+
+---
+class: inverse, center, middle
+# Composing Data Graphics
+
+---
+### Visual Cues
+
+- Position - where in relation to other things?
+- Length - how big (in one dimension)?
+- Angle - how wide? parallel to something else?
+- Direction - at what slope? Up or down (time series)?
+- Area - how big (in two dimensions)
+- Shade/Color - to what extent? **Beware of red/green color blindness**
+
+Our ability to perceive differences gets worse as we go down this list. This helps explain why bar charts are usually (always!) preferred over pie charts and why color gradients are often frustrating to interpret.
+
+---
+### Visual Cues
+![](pics/world_map.png)
+![](pics/world_map_key.png)
+[https://en.wikipedia.org/wiki/List_of_countries_by_traffic-related_death_rate](https://en.wikipedia.org/wiki/List_of_countries_by_traffic-related_death_rate)
+---
+### Coordinate systems
+
+How should we organize our data?
+
+*Most frequently used*
+- Cartesian - *x-y* rectangular coordinate system w/perpendicular axes
+
+*Rarely used*
+- Polar - points identified  by angle `\(\theta\)` and radius `\(\rho\)`
+
+*Used for spatial data*
+- Geographic - mapping points on the earth's curved surface to a 2-d plane
+
+---
+### Scale
+
+Translating values into visual cues. How does distance in the graphic translate into meaningful differences in quantity?
+
+.pull-left[
+- Numeric - typically on a *linear*, *logarithmic*, or *percentage* scale.
+
+- Categorical - *ordinal* (disagree, neutral, agree) or *nominal* (male, female)
+
+- Time 
+]
+.pull-right[
+![](intro_to_data_science_session_2_2_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+]
+---
+### Layers
+
+Visualizing multidimensional data in a 2-d image in an effective way is a challenge. A few techniques you can use to incorporate many variables are:
+
+.pull-left[
+- Small multiples - *facets*. The same plot is shown several times, on a grid, with one discrete variable changing in each plot.
+
+- Layers - colors/gradients, symbols/shapes, text, size
+
+- Animation - works if *time* is the additional variable, but doesn't show all data at once.
+]
+.pull-right[
+![](intro_to_data_science_session_2_2_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+]
+---
+### Color
+.pull-left[
+- Sequential - ordering of the data has one direction
+
+- Qualitative - no ordering of the data
+
+- Diverging - ordering of the data has two directions
+]
+.pull-right[
+
+```r
+library(RColorBrewer)
+display.brewer.all()
+```
+
+![](intro_to_data_science_session_2_2_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+]
+---
+class: inverse, center, middle
+
+# End of Session 2.2
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

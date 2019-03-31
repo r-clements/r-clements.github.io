@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Data Science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Robert Clements" />
+    <link rel="stylesheet" href="rc_css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Data Science
+## Session 3.2
+### Robert Clements
+
+---
+
+
+
+
+### Session 3.2 Outline
+
+- When to use R Markdown
+- R Basics
+  + *R for Data Science - Section 4*
+- R Markdown Basics
+- R Scripts
+- R Projects
+
+---
+class: inverse, center, middle
+
+# When to use R Markdown
+
+---
+### Do I always use R Markdown in my work?
+
+No. My workflow (once I start the *real* data work) typically looks like this:
+
+- Create folders for my code, sample data, and documents 
+  + I like the [Microsoft Team Data Science Process](https://docs.microsoft.com/en-us/azure/machine-learning/team-data-science-process/overview)
+- Using RStudio, write code in R scripts
+  + Hit File -&gt; New File -&gt; R Script OR select the new file icon arrow and choose 'R Script'
+  + Each script is for a specific task I'm doing (e.g. data clean up; adhoc analyses; create new data set from existing data set)
+  + I may also be writing Hive, SQL, or other code during this time, usually not in RStudio
+
+  
+---
+### Do I always use R Markdown in my work?
+
+No. My workflow (once I start the *real* data work) typically looks like this:
+
+- Once I have *tangible* results to show, that is when I start thinking about if I need to document the results
+  + Lots of analyses are minor, go nowhere, and I don't formalize these
+  + If yes, that is when I start an R Markdown document
+- On occasion I'm asked to do some quick analyses and report the results to business (e.g. how did the model perform last month? what is the expected $$ savings during out pilot?)
+  + These I will write up in R Markdown
+---
+class: center, middle, inverse
+
+# Demo of R Markdown report from work
+
+---
+class: center, middle, inverse
+
+# R Basics!!!
+
+---
+### R Basics
+
+Congratulations!! You've made it this far.
+
+.center[![](pics/gold_star.gif)]
+---
+### R Basics
+
+Follow along in RStudio...
+
+- R is case sensitive, but white space doesn't matter
+
+--
+
+- Use R as calculator (type these directly in the lower-left Console pane)
+
+
+```r
+2 + 3
+```
+
+```
+## [1] 5
+```
+
+```r
+sin(pi / 2)
+```
+
+```
+## [1] 1
+```
+---
+### R Basics
+
+- R is case sensitive, but white space doesn't matter
+
+- Use R as calculator
+
+- Create new objects with: `&lt;-` 
+  + `object_name &lt;- value`
+  + Do **not** use `=` to create new objects
+  + Keyboard shortcut: `Alt -` (minus)
+  
+
+```r
+x &lt;- 3 * 4
+x
+```
+
+```
+## [1] 12
+```
+---
+### R Basics
+
+- R is case sensitive, but white space doesn't matter
+
+- Use R as calculator
+
+- Create new objects with: `&lt;-` 
+  + `object_name &lt;- value` 
+  + Do **not** use `=` to create new objects
+  + Keyboard shortcut: `Alt -` (minus)
+  
+- Object names must start with a letter, and can only contain letters, numbers, `_` and `.` 
+  + **Be descriptive!** Don't use `dat1, dat2, x1, x2`, etc.
+  + **Be careful!** Don't use `data`, `function`, `mean`, or any name that may already be taken by an R function
+  + Style tip: use lower snake_case (e.g. `my_variable_name`)
+
+---
+### R Basics
+
+- Inspect objects
+
+
+```r
+r_rocks &lt;- 2 ^ 3
+r_rock
+```
+
+```
+## Error in eval(expr, envir, enclos): object 'r_rock' not found
+```
+
+```r
+R_rocks
+```
+
+```
+## Error in eval(expr, envir, enclos): object 'R_rocks' not found
+```
+---
+### R Basics
+
+- Inspect objects
+
+- Calling functions
+
+
+```r
+function_name(argument1 = value1, argument2 = value2, ...)
+```
+
+
+```r
+seq(1, 10, length.out = 5)
+```
+
+```
+## [1]  1.00  3.25  5.50  7.75 10.00
+```
+
+---
+### R Basics
+
+- Inspect objects
+
+- Calling functions
+
+
+```r
+function_name(argument1 = value1, argument2 = value2, ...)
+```
+
+- Quotes and Parentheses always come in pairs
+
+```
+&gt; x &lt;- "hello world
++
+```
+
+*that plus sign means that R is waiting for you to complete something*
+---
+### R Basics
+
+- Inspect objects
+
+- Calling functions
+
+
+```r
+function_name(argument1 = value1, argument2 = value2, ...)
+```
+
+- Quotes and Parentheses always come in pairs
+
+- Keyboard shortcuts: press `Alt + Shift + K`
+  + Hit `Esc` to close it
+
+--
+
+- Get help on functions and datasets using `?function_name` or `?data_name`
+---
+### R Markdown Basics
+
+Open a new R Markdown file (File -&gt; New File -&gt; R Markdown OR New file icon dropdown -&gt; R Markdown).
+
+In-class demo of:
+
+- YAML front matter
+- Code Chunks and code chunk options
+- Code inline
+- Text
+  + highlighting
+  + font sizes and headers
+  + bold and italic
+  + bulleted lists
+  
+---
+### R Scripts
+
+Open a new R script file (File -&gt; New File -&gt; R Script OR New file icon dropdown -&gt; R Script OR hit `Ctrl + Shift + N`). 
+
+- Contains R code and comments, nothing else
+- Code must be interpreted by R in the R console
+- Send code to the R console using keyboard shortcuts or the `Run` button
+- Scripts can be *sourced* by other scripts, meaning all code will be run at once
+
+
+```r
+# this is a comment. You can tell by the # at the front.
+# be generous with your comments
+
+# Run code one line at a time using Ctrl + Enter
+# load ggplot2
+library(ggplot2)
+
+# plot barchart of cut variable
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut))
+```
+---
+### R Projects
+
+Using R Projects allows you to:
+
+- divide your work in a straightforward way
+
+- keeps track of each project's
+  + working directory (shown in Files pane)
+  + history (History pane and Console pane)
+  + workspace (Environment pane)
+  + scripts (Source pane)
+  
+- easy to switch between projects
+  + drop-down upper right corner of RStudio
+
+.center[![](pics/r_project_icon.png)]
+
+---
+### RStudio 
+
+Take a second to play around with RStudio's panes and look through the drop-down menus. 
+
+Change the appearance of RStudio in the Global Options. Dark background with off-white text is easier on the eyes.
+
+Explore your file system in the File pane. You should be able to find most files that exist on your computer here.
+
+
+
+---
+class: inverse, center, middle
+
+# End of Session 3.2
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

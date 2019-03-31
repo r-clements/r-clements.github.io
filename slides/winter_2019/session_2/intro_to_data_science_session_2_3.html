@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Data Science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Robert Clements" />
+    <link rel="stylesheet" href="rc_css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Data Science
+## Session 2.3
+### Robert Clements
+
+---
+
+
+
+
+### Session 2.3 Outline
+
+- ggplot2: A Grammar for Graphics
+- Aesthetics
+- Geometric Objects
+- Statistical Transformations
+- Labels and themes
+---
+class: inverse, center, middle
+# ggplot2: A Grammar for Graphics
+
+---
+# The Theory
+
+Read it (and references within) here: 
+[ http://vita.had.co.nz/papers/layered-grammar.pdf]( http://vita.had.co.nz/papers/layered-grammar.pdf)
+
+---
+# The ggplot2 R package...
+
+is contained in the tidyverse. To load it, you can load the tidyverse, or just load it separately:
+
+
+```r
+library(tidyverse)
+### OR
+library(ggplot2)
+```
+
+Plotting with ggplot2 almost always looks like this:
+
+`ggplot(data=) + geom_****() + `
+
+Where `ggplot()` sets up the coordinate system to add the layers (such as `geom_****()`) to.
+
+You can assign your plots to a variable and add more to them later:
+
+
+```r
+g &lt;- ggplot() + geom_****()
+g &lt;- g + xlab()
+g &lt;- g + ylab()
+g
+```
+---
+class: inverse, center, middle
+# Aesthetics
+---
+### ggplot2 uses aesthetics (`aes()`)
+
+An *aesthetic* is an explicit mapping between a variable and the visual cues that represent its values, or a visual property of the objects in your plot (which we may call levels).
+
+---
+### ggplot2 uses aesthetics (`aes()`)
+
+We can change the levels of a point's
+- **size**
+- shape
+- color
+- alpha
+
+
+```r
+library(ggplot2)
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy, size = class))
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+### ggplot2 uses aesthetics (`aes()`)
+We can change the levels of a point's
+- size
+- **shape**
+- color
+- alpha
+
+
+```r
+library(ggplot2)
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy, shape = class))
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+---
+### ggplot2 uses aesthetics (`aes()`)
+We can change the levels of a point's
+- size
+- shape
+- **color**
+- alpha
+
+
+```r
+library(ggplot2)
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy, color = class))
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+---
+### ggplot2 uses aesthetics (`aes()`)
+We can change the levels of a point's
+- size
+- shape
+- color
+- **alpha**
+
+
+```r
+library(ggplot2)
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy, alpha = class))
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+---
+### ggplot2 uses aesthetics (`aes()`)
+We can also *set* the levels of a point's aesthetic.
+
+
+```r
+library(ggplot2)
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy), color = 'blue', alpha = .5)
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+---
+### ggplot2 uses aesthetics (`aes()`)
+We can also *set* the levels of a point's aesthetic.
+
+- color = quoted color name
+- size = number (in mm)
+- shape = number (below chart)
+- alpha = number between 0 and 1 (0 = invisible, 1 = solid)
+
+![](pics/shape_num.png)
+---
+class: inverse, center, middle
+# Geometric Objects
+---
+### ggplot uses geometric objects, or geoms (`geom_****()`)
+
+A geom is the geometrical object that a plot uses to represent data.
+
+Every geom function takes a `mapping = aes()` argument, but not every aesthetic can be used with each geom.
+
+ggplot2 contains 30 different geoms, and other extension packages contain even more. But don't worry, there is a cheatsheet here: [http://rstudio.com/cheatsheets](http://rstudio.com/cheatsheets).
+---
+### ggplot uses geometric objects, or geoms (`geom_****()`)
+
+
+```r
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy))
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+---
+### ggplot uses geometric objects, or geoms (`geom_****()`)
+
+
+```r
+ggplot(data = mpg) + 
+  geom_smooth(mapping = aes(x = displ, y = hwy))
+```
+
+```
+## `geom_smooth()` using method = 'loess'
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+---
+### ggplot uses geometric objects, or geoms (`geom_****()`)
+
+You can plot multiple geoms:
+
+
+```r
+ggplot(data = mpg) + 
+  geom_smooth(mapping = aes(x = displ, y = hwy)) +
+  geom_point(mapping = aes(x = displ, y = hwy))
+```
+
+```
+## `geom_smooth()` using method = 'loess'
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+---
+### ggplot uses geometric objects, or geoms (`geom_****()`)
+
+You can plot multiple geoms, with less code:
+
+
+```r
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_smooth() +
+  geom_point()
+```
+
+```
+## `geom_smooth()` using method = 'loess'
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+---
+### ggplot uses geometric objects, or geoms (`geom_****()`)
+
+You can plot multiple geoms, with less code, with aesthetics:
+
+
+```r
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_smooth() +
+  geom_point(mapping = aes(color = drv))
+```
+
+```
+## `geom_smooth()` using method = 'loess'
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+---
+### ggplot uses geometric objects, or geoms (`geom_****()`)
+
+You can plot multiple geoms, with less code, with aesthetics:
+
+
+```r
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_smooth(mapping = aes(group = drv)) +
+  geom_point(mapping = aes(color = drv))
+```
+
+```
+## `geom_smooth()` using method = 'loess'
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+---
+class: inverse, center, middle
+# Statistical Transformations
+---
+### Statistical transformations
+
+Some plots do not use the raw data values. Plots like bar plots, histograms, box plots use counts, proportions, or quantiles. ggplot computes these statistical transformations from the data for you.
+
+---
+### Statistical transformations
+
+The diamonds dataset:
+
+```r
+head(diamonds)
+```
+
+```
+## # A tibble: 6 x 10
+##   carat cut       color clarity depth table price     x     y     z
+##   &lt;dbl&gt; &lt;ord&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1 0.230 Ideal     E     SI2      61.5  55.0   326  3.95  3.98  2.43
+## 2 0.210 Premium   E     SI1      59.8  61.0   326  3.89  3.84  2.31
+## 3 0.230 Good      E     VS1      56.9  65.0   327  4.05  4.07  2.31
+## 4 0.290 Premium   I     VS2      62.4  58.0   334  4.20  4.23  2.63
+## 5 0.310 Good      J     SI2      63.3  58.0   335  4.34  4.35  2.75
+## 6 0.240 Very Good J     VVS2     62.8  57.0   336  3.94  3.96  2.48
+```
+---
+### Statistical transformations
+
+Look at the y-axis. Was there a `count` variable in the dataset?
+
+
+```r
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = cut))
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+### Statistical transformations
+
+Look at the y-axis. Was there a `count` variable in the dataset? No. `geom_bar` has a statistical transformation associated with it
+
+```r
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = cut))
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Statistical transformations
+
+Look at the y-axis. Was there a `count` variable in the dataset? No. `geom_bar` has a statistical transformation associated with it, which you can also use like this:
+
+```r
+ggplot(data = diamonds) +
+  stat_count(mapping = aes(x = cut))
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-17-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Statistical transformations
+
+What if we want to plot proportions instead? The below code doesn't work unfortunately.
+
+```r
+ggplot(data = diamonds) +
+  stat_prop(mapping = aes(x = cut))
+```
+---
+### Statistical transformations
+
+What if we want to plot proportions instead? This code works!
+
+```r
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = cut, y = ..count../sum(..count..)))
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-19-1.png" style="display: block; margin: auto;" /&gt;
+---
+class: inverse, center, middle
+# Labels and Themes
+---
+### Labels and themes
+
+Remember that a graph without labels will not help you in telling your story.
+
+Let's see how we can improve the previous plot.
+
+
+```r
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = cut, y = ..count../sum(..count..)))
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+### Labels and themes
+
+Remember that a graph without labels will not help you in telling your story.
+
+Let's see how we can improve the previous plot.
+
+
+```r
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = cut, y = ..count../sum(..count..))) + 
+  xlab('Cut of diamond')
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-21-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+### Labels and themes
+
+Remember that a graph without labels will not help you in telling your story.
+
+Let's see how we can improve the previous plot.
+
+
+```r
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = cut, y = ..count../sum(..count..))) +
+  xlab('Cut of diamond') +
+  ylab('Proportion') +
+  ggtitle('Prevalence of each cut of diamond')
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+### Labels and themes
+
+ggplot2 also contains many themes, and so do some external packages. You can even build your own!
+
+
+```r
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = cut, y = ..count../sum(..count..))) +
+  xlab('Cut of diamond') +
+  ylab('Proportion') +
+  ggtitle('Prevalence of each cut of diamond') +
+  theme_dark()
+```
+
+&lt;img src="intro_to_data_science_session_2_3_files/figure-html/unnamed-chunk-23-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+class: inverse, center, middle
+
+# End of Session 2.3
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

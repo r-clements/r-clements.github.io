@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Data Science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Robert Clements" />
+    <link rel="stylesheet" href="rc_css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Data Science
+## Session 4.1
+### Robert Clements
+
+---
+
+
+
+
+### Housekeeping
+
+- Homework:
+  + Questions on Homework 3?
+  + Homework 2 solutions are up
+- Readings for next week
+- Midterm will be assigned next Tuesday (2/26) and due the following Tuesday (3/5)
+  + It will be comprehensive, including material from next week
+  + It is worth 30% of your grade
+  + Late assignments will get a zero grade 
+
+---
+class: inverse, center, middle
+
+# Before we begin...
+
+---
+
+### Turn your chairs towards your neighbors and talk to each other for 5 minutes
+
+Bump elbows if you don't like shaking hands
+
+Some topics of conversation:
+
+- Your name
+- Where you're from
+- Your superpower
+- Your kryptonite
+- Your favorite musician/band
+- A justification for the ontological necessity of modern man's existential dilemma
+- What you're most curious about in Data Science
+
+.center[![](pics/handshake.jpg)]
+
+---
+### Session 4.1 Outline
+
+- The summarize() verb
+  + *R for Data Science - Section 5.6*
+  + *Modern Data Science with R - Chapter 4.1.4*
+
+---
+class: inverse, center, middle
+# The summarize() verb
+---
+### The `summarize()` verb
+
+`summarize()` only makes sense if you *group by* a variable
+
+
+```r
+library(dplyr)
+library(nycflights13)
+summarize(flights, delay = mean(dep_delay, na.rm = TRUE))
+```
+
+```
+## # A tibble: 1 x 1
+##   delay
+##   &lt;dbl&gt;
+## 1  12.6
+```
+---
+### The `summarize()` verb
+
+![](pics/summary.png)
+---
+### The `summarize()` verb and the pipe
+
+
+```r
+flights %&gt;% 
+  group_by(dest) %&gt;% 
+  summarise(
+    count = n(),
+    dist = mean(distance, na.rm = TRUE),
+    delay = mean(arr_delay, na.rm = TRUE)
+  )
+```
+
+```
+## # A tibble: 105 x 4
+##    dest  count  dist  delay
+##    &lt;chr&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;
+##  1 ABQ     254  1826   4.38
+##  2 ACK     265   199   4.85
+##  3 ALB     439   143  14.4 
+##  4 ANC       8  3370 - 2.50
+##  5 ATL   17215   757  11.3 
+##  6 AUS    2439  1514   6.02
+##  7 AVL     275   584   8.00
+##  8 BDL     443   116   7.05
+##  9 BGR     375   378   8.03
+## 10 BHM     297   866  16.9 
+## # ... with 95 more rows
+```
+---
+### na.rm = TRUE?
+
+Recall that missing values are represented in R as NA (not available). When working with *real* data, you'll have to be aware of how R, and R aggregation functions, might treat NA values.
+
+
+```r
+x &lt;- NA
+x == NA
+```
+
+```
+## [1] NA
+```
+
+```r
+is.na(x)
+```
+
+```
+## [1] TRUE
+```
+
+```r
+NA ^ 0
+```
+
+```
+## [1] 1
+```
+
+```r
+NA | TRUE
+```
+
+```
+## [1] TRUE
+```
+---
+### na.rm = TRUE?
+
+Recall that missing values are represented in R as NA (not available). When working with *real* data, you'll have to be aware of how R, and R aggregation functions, might treat NA values.
+
+For example, many aggregation functions (`mean()`, `sd()`, `var()`, `median()`, etc.) have an argument called `na.rm` (NA dot remove). Set this to `TRUE` to remove NA values before computing.
+
+
+```r
+x &lt;- c(5,5,5,5,5,5,5,NA)
+mean(x)
+```
+
+```
+## [1] NA
+```
+
+```r
+mean(x, na.rm = TRUE)
+```
+
+```
+## [1] 5
+```
+---
+### The pipe operator `%&gt;%`
+
+Recall 
+
+`function_1 %&gt;% function_2 %&gt;% function_3 %&gt;% ...` 
+  
+is read 
+  
+`function_1 then function_2 then function_3 then ...`
+
+And
+
+`x %&gt;% f(y)` turns into `f(x, y)`
+---
+### Counts with `summarize()`
+
+Counting number of observations, number of distinct observations, and number of non-missing observations:
+
+
+```r
+flights %&gt;% 
+  group_by(dest) %&gt;% 
+  summarise(
+    count = n(),
+    count_dist = n_distinct(arr_delay),
+    count_non_miss = sum(!is.na(arr_delay))
+  )
+```
+
+```
+## # A tibble: 105 x 4
+##    dest  count count_dist count_non_miss
+##    &lt;chr&gt; &lt;int&gt;      &lt;int&gt;          &lt;int&gt;
+##  1 ABQ     254        122            254
+##  2 ACK     265         77            264
+##  3 ALB     439        133            418
+##  4 ANC       8          7              8
+##  5 ATL   17215        372          16837
+##  6 AUS    2439        225           2411
+##  7 AVL     275         85            261
+##  8 BDL     443        121            412
+##  9 BGR     375        120            358
+## 10 BHM     297        125            269
+## # ... with 95 more rows
+```
+---
+### Counts without `summarize()`
+
+Counting number of observations:
+
+
+```r
+flights %&gt;% 
+  count(dest)
+```
+
+```
+## # A tibble: 105 x 2
+##    dest      n
+##    &lt;chr&gt; &lt;int&gt;
+##  1 ABQ     254
+##  2 ACK     265
+##  3 ALB     439
+##  4 ANC       8
+##  5 ATL   17215
+##  6 AUS    2439
+##  7 AVL     275
+##  8 BDL     443
+##  9 BGR     375
+## 10 BHM     297
+## # ... with 95 more rows
+```
+---
+### Common `summarise()` functions
+
+Measures of center:  
+`mean()`  
+`median()` - the point at which 50% of data falls above and below (robust)  
+  
+Measures of spread:  
+`sd()` - std dev  
+`IQR()` - inter-quartile range (75th percentile - 25th percentile)  
+`mad()` - median absolute deviations from the median (robust)  
+
+Measures of rank:  
+`min()`  
+`max()`  
+`quantile()` - example: `quantile(x, .25)` will find the 25th percentile of `x` 
+
+Measures of position:  
+`first(x)`  
+`nth(x, 2)`   
+`last(x)`
+---
+### Counts and proportions of logicals
+
+Logicals evaluate to `TRUE` or `FALSE`. When plugging in logicals to numeric functions, `TRUE = 1` and `FALSE = 0`.
+
+
+```r
+flights %&gt;%
+  group_by(year, month, day) %&gt;% 
+  summarise(non_miss = sum(!is.na(dep_time)), 
+            n_early = sum(dep_time &lt; 500, na.rm = TRUE),
+            prop_early = mean(dep_time &lt; 500, na.rm = TRUE))
+```
+
+```
+## # A tibble: 365 x 6
+## # Groups: year, month [?]
+##     year month   day non_miss n_early prop_early
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;   &lt;int&gt;      &lt;dbl&gt;
+##  1  2013     1     1      838       0    0      
+##  2  2013     1     2      935       3    0.00321
+##  3  2013     1     3      904       4    0.00442
+##  4  2013     1     4      909       3    0.00330
+##  5  2013     1     5      717       3    0.00418
+##  6  2013     1     6      831       2    0.00241
+##  7  2013     1     7      930       2    0.00215
+##  8  2013     1     8      895       1    0.00112
+##  9  2013     1     9      897       3    0.00334
+## 10  2013     1    10      929       3    0.00323
+## # ... with 355 more rows
+```
+---
+### Pop quiz
+
+If we define cancelled flights like so:
+
+
+```r
+flights %&gt;% 
+  filter(is.na(dep_delay) | is.na(arr_delay))
+```
+
+What is the number and proportion of cancelled flights on Febuary 20th, 2013? Use summarize along with the sum and mean of logical values in your final answer.
+
+Hint: the final answer is:
+
+
+```
+## # A tibble: 1 x 4
+## # Groups: month [1]
+##   month   day num_cancelled prop_cancelled
+##   &lt;int&gt; &lt;int&gt;         &lt;int&gt;          &lt;dbl&gt;
+## 1     2    20            16         0.0169
+```
+---
+class: inverse, center, middle
+
+# End of Session 4.1
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

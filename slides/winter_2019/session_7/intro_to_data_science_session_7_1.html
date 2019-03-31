@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Data Science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Robert Clements" />
+    <link rel="stylesheet" href="rc_css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Data Science
+## Session 7.1
+### Robert Clements
+
+---
+
+
+
+### Housekeeping
+
+- Midterms have been graded
+- Want to dig deeper with machine/statistical learning?
+  + UC Berkeley Extension offers four machine learning courses (**Python**, Spark, **R**, Tensorflow)
+  + Coursera - [Machine Learning](https://www.coursera.org/learn/machine-learning#)
+- Any other questions?
+
+---
+### Session 7.1 Outline
+
+- Midterm Review
+- Statistical learning
+  + More with Regression
+  + *Introduction to Statistical Learning - Chapter 3*
+---
+class: inverse, center, middle
+# Midterm review
+---
+class: inverse, center, middle
+# Statistical Learning I
+---
+### Regression
+
+How did we estimate this function?
+
+`$$\large \mbox{price} = -2256 + 7756 \times \mbox{carat}$$`
+
+We minimized the sum of the residuals (squared). Recall 
+
+residuals = observed value - predicted value
+
+The observed values of price are given in the data. The predicted values of price come from our function.
+
+&lt;img src="intro_to_data_science_session_7_1_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Regression
+
+With simple linear regression, we assume a linear relationship between X and Y.
+
+**Parametric** 
+
+`$$\huge f(X) = \beta_{0} + \beta_{1}X_{1} + \beta_{2}X_{2} + \ldots + \beta_{p}X_{p}$$`
+
+We would love to know all of the `\(\Huge \beta\)` values, but we won't, so we estimate them:
+
+`$$\huge \hat{f}(X) = \hat{\beta}_{0} + \hat{\beta}_{1}X_{1} + \hat{\beta}_{2}X_{2} + \ldots + \hat{\beta}_{p}X_{p}$$`
+---
+### Regression assumptions
+
+- Linearity - the mean of our target is a linear combination of our features
+
+- Constant variance (homoskedasticity) - the error around the regression line should be constant
+
+- Independence - errors are independent and uncorrelated
+
+- No multicollinearity - uncorrelated features
+---
+### Regression solution
+
+For those who are curious, the coefficients `\(\Huge \hat{\beta}\)` are estimated like so:
+
+`$$\huge \hat{\beta} = (X^{T}X)^{-1}X^{T}y$$`
+
+where `\(\Huge X\)` is a matrix of all of our features, and `\(\Huge y\)` is our target
+---
+### Regression in R
+
+For a deep dive into regression (which can literally take years to learn), please check the readings. For now I want to focus only on these three topics:
+
+1. Coefficient interpretation and accuracy 
+
+2. Model accuracy
+
+3. Multiple regression (more than one feature)
+
+---
+### Regression in R
+
+There is, of course, a mathematical way to estimate our regression model. I'll leave that to you to read up on. But, to do it in R we will use the `lm()` function (linear model). For the formula argument, the target is on the left and the features are on the right.
+
+
+```r
+(diam_lm &lt;- lm(formula = price ~ carat, data = diamonds))
+```
+
+```
+## 
+## Call:
+## lm(formula = price ~ carat, data = diamonds)
+## 
+## Coefficients:
+## (Intercept)        carat  
+##       -2256         7756
+```
+---
+### Interpreting the coefficients
+
+`$$\large \mbox{price} = -2256 + 7756 \times \mbox{carat}$$`
+
+For every one unit increase in carat, the price increases, **on average**, by $7756.
+
+If carat = 0, average price is -$2256
+---
+### Significance of coefficients
+
+We ask ourselves two questions about our coefficients:
+
+1. Are they equal to zero? If so, that feature is not a good predictor of our target.
+
+2. What is the effect size, or the practical implications of the coefficient?
+---
+### Significance of coefficients
+
+Recall that we are *estimating* the coefficients, which means they have variability.
+
+What does our model look like if we were to take a random sample of the data and fit a new model?
+
+&lt;img src="intro_to_data_science_session_7_1_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Significance of coefficients
+
+Recall that we are *estimating* the coefficients, which means they have variability.
+
+What does our model look like if we were to take a random sample of the data and fit a new model?
+
+&lt;img src="intro_to_data_science_session_7_1_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Significance of coefficients
+
+Recall that we are *estimating* the coefficients, which means they have variability.
+
+What does our model look like if we were to take a random sample of the data and fit a new model?
+
+&lt;img src="intro_to_data_science_session_7_1_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Significance of coefficients
+
+Recall that we are *estimating* the coefficients, which means they have variability.
+
+What does our model look like if we were to take a random sample of the data and fit a new model?
+
+&lt;img src="intro_to_data_science_session_7_1_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Significance of coefficients
+
+Recall that we are *estimating* the coefficients, which means they have variability.
+
+What does our model look like if we were to take a random sample of the data and fit a new model?
+
+&lt;img src="intro_to_data_science_session_7_1_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Significance of coefficients
+
+Let's do something similar to what we did last session with the standard error of the mean.
+
+
+```r
+n &lt;- 1000 #how many samples
+slopes &lt;- rep(NA, n) # empty vector for saving coefficients
+for(i in 1:n) {
+  diam_samp &lt;- diamonds %&gt;% sample_n(10000) # random sample
+  diam_samp_lm &lt;- lm(price ~ carat, data = diam_samp)
+  slopes[i] &lt;- coef(diam_samp_lm)[2] # store the coefficient
+}
+slopes &lt;- as_tibble(slopes)
+```
+---
+### Significance of coefficients
+
+Let's do something similar to what we did last session with the standard error of the mean.
+
+Back to our first question about coefficients: is the coefficient equal to zero?
+
+
+```r
+slopes %&gt;% ggplot(aes(x = slopes)) +
+  geom_histogram()
+```
+
+&lt;img src="intro_to_data_science_session_7_1_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Significance of coefficients
+
+As you can see, the answer to our question depends on the standard error of our coefficients. 
+
+What if we had seen this histogram instead?
+
+&lt;img src="intro_to_data_science_session_7_1_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Significance of coefficients
+
+We typically rely on the p-value to tell us if our coefficient is significantly different than zero, using an estimate of the standard error.
+
+In words, the p-value in this case would be defined as: the probability of getting a coefficient as or more extreme than what we got, if the *true* coefficient was actually zero.
+
+Let's check the p-values from our regression model:
+
+
+```r
+library(broom)
+tidy(diam_lm)
+```
+
+```
+##          term  estimate std.error statistic p.value
+## 1 (Intercept) -2256.361  13.05535 -172.8304       0
+## 2       carat  7756.426  14.06658  551.4081       0
+```
+---
+### Significance of coefficients
+
+The p-values for both the intercept and the slope (coefficient on `carat`) are zero, meaning we would say: 
+
+*the probability of getting a coefficient of 7756 or bigger, if there was actually no relationship between carat and price, is zero, so we conclude that carat is a significant predictor of price*.
+
+
+```r
+library(broom)
+tidy(diam_lm)
+```
+
+```
+##          term  estimate std.error statistic p.value
+## 1 (Intercept) -2256.361  13.05535 -172.8304       0
+## 2       carat  7756.426  14.06658  551.4081       0
+```
+---
+### broom??? tidy???
+
+The `broom` package is a nice package for converting statistical analysis objects from R into tidy data frames. Otherwise, we have to deal with things like this:
+
+
+```r
+summary(diam_lm)
+```
+
+```
+## 
+## Call:
+## lm(formula = price ~ carat, data = diamonds)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -18585.3   -804.8    -18.9    537.4  12731.7 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -2256.36      13.06  -172.8   &lt;2e-16 ***
+## carat        7756.43      14.07   551.4   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1549 on 53938 degrees of freedom
+## Multiple R-squared:  0.8493,	Adjusted R-squared:  0.8493 
+## F-statistic: 3.041e+05 on 1 and 53938 DF,  p-value: &lt; 2.2e-16
+```
+---
+### Effect size
+
+The second question we should ask is: what is the practical implication of our coefficient? Is it meaningful to say that for every 1 unit increase in carat, the price increases on average by $7756?
+
+This is a question that depends on the data, and your knowledge of it. 
+
+
+```r
+library(broom)
+tidy(diam_lm)
+```
+
+```
+##          term  estimate std.error statistic p.value
+## 1 (Intercept) -2256.361  13.05535 -172.8304       0
+## 2       carat  7756.426  14.06658  551.4081       0
+```
+---
+### Question 
+
+Assume the coefficient on carat was 0.1, with a p-value of 0.05. Answer these questions:
+
+1. Interpret the coefficient.
+
+2. Is carat a signficant predictor?
+
+3. Explain the p-value in words?
+
+4. Is there a large effect size?
+---
+### Model accuracy
+
+
+
+From here we want to know how well does the model fit the data. We will use `\(\large R^2\)` for this.
+
+`\(\large R^2\)` is the proportion of variability in `\(\large Y\)` that is explained by our model:
+
+`$$R^2 = 1 - \frac{SS_{Error}}{SS_{Total}}$$`
+
+where `\(SS_{Error}\)` = the sum of the squared residuals, and
+
+`\(SS_{Total}\)` = the total sum of squares = `\(\sum_{i = 1}^{n}(y_{i}-\bar{y})^2\)`
+
+---
+### Model accuracy
+
+For example:
+
+- here's the total variability in `\(\large Y\)`
+
+&lt;img src="intro_to_data_science_session_7_1_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Model accuracy
+
+- now fit the model
+
+&lt;img src="intro_to_data_science_session_7_1_files/figure-html/unnamed-chunk-17-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Model accuracy
+
+- here's the model's variability. The spread of points around the model looks smaller than the spread of points around the mean. We would say that `carat` helped **explain** some of the variance in `price`.
+
+&lt;img src="intro_to_data_science_session_7_1_files/figure-html/unnamed-chunk-18-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Model accuracy
+
+- `\(\large R^2\)` is the proportion of this...
+
+&lt;img src="intro_to_data_science_session_7_1_files/figure-html/unnamed-chunk-19-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Model accuracy
+
+- `\(\large R^2\)` is the proportion of this...explained by this
+
+&lt;img src="intro_to_data_science_session_7_1_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Model accuracy
+
+`\(\large R^2\)` is the proportion of variability in `\(\large Y\)` that is explained by our model:
+
+
+```r
+library(broom)
+glance(diam_lm)
+```
+
+```
+##   r.squared adj.r.squared    sigma statistic p.value df    logLik      AIC
+## 1 0.8493305     0.8493277 1548.562  304050.9       0  2 -472730.3 945466.5
+##        BIC     deviance df.residual
+## 1 945493.2 129345695398       53938
+```
+---
+### Model accuracy
+
+Important points: 
+
+- `\(\large R^2\)` is always between 0 and 1
+
+- the bigger `\(\large R^2\)` is, the *better* your model fits the data
+
+- a small `\(\large R^2\)` doesn't always mean the model is a poor fit (social sciences often have small `\(\large R^2\)`)
+
+- `\(\large R^2\)` always increases as you add more features to your model (the `adjusted` `\(\large R^2\)` should be used instead - it penalizes the `\(\large R^2\)` for each additional feature)
+
+`$$\text{adjusted-}R^2 = 1 - \frac{SS_{Error}}{SS_{Total}}\times \frac{n-1}{n-k-1}$$`
+
+where `\(n\)` = number of observations and `\(k\)` = number of features
+---
+### Multiple regression
+
+Multiple regression is when we fit a model with *more than one* feature. Let's add `x`, `y`, and `z` from the dataset to the model. 
+
+
+```r
+diam_mult_lm &lt;- lm(price ~ carat + x + y + z, data = diamonds)
+tidy(diam_mult_lm)
+```
+
+```
+##          term   estimate std.error  statistic       p.value
+## 1 (Intercept)  1921.1740 104.37341  18.406737  1.976728e-75
+## 2       carat 10233.9134  62.93665 162.606589  0.000000e+00
+## 3           x  -884.2091  40.47045 -21.848267 2.317412e-105
+## 4           y   166.0384  25.85842   6.421058  1.364520e-10
+## 5           z  -576.2035  39.28224 -14.668295  1.277069e-48
+```
+---
+### Multiple regression
+
+Recall what we said about the `\(\large R^2\)` when we add more features?
+
+
+```r
+glance(diam_lm)
+```
+
+```
+##   r.squared adj.r.squared    sigma statistic p.value df    logLik      AIC
+## 1 0.8493305     0.8493277 1548.562  304050.9       0  2 -472730.3 945466.5
+##        BIC     deviance df.residual
+## 1 945493.2 129345695398       53938
+```
+
+```r
+glance(diam_mult_lm)
+```
+
+```
+##   r.squared adj.r.squared    sigma statistic p.value df    logLik      AIC
+## 1 0.8540786     0.8540677 1524.009  78920.42       0  5 -471866.7 943745.4
+##        BIC     deviance df.residual
+## 1 943798.7 125269642979       53935
+```
+---
+### Interpreting coefficients
+
+Now that we have more than one feature in the model, we add a little verbiage to our interpretation to account for the *other* features.
+
+Ex: for every one unit increase in **carat**, the price increases, **on average**, by $10,234, **controlling for all other features**, i.e. assuming all other features are held constant.
+
+
+```r
+tidy(diam_mult_lm)
+```
+
+```
+##          term   estimate std.error  statistic       p.value
+## 1 (Intercept)  1921.1740 104.37341  18.406737  1.976728e-75
+## 2       carat 10233.9134  62.93665 162.606589  0.000000e+00
+## 3           x  -884.2091  40.47045 -21.848267 2.317412e-105
+## 4           y   166.0384  25.85842   6.421058  1.364520e-10
+## 5           z  -576.2035  39.28224 -14.668295  1.277069e-48
+```
+---
+### Pop Quiz
+
+The model with `carat`, `x`, `y`, and `z` had a slightly higher adjusted `\(\large R^2\)` value and all significant features, but why might it not be a good idea to add `x`, `y`, and `z` to our model? 
+
+Hint: take a look at the `cor()` function.
+
+---
+### Multiple regression
+
+We can also add categorical variables to our model? Let's add `cut`:
+
+
+```r
+diamonds &lt;- diamonds %&gt;% mutate(cut_fct = factor(cut, ordered = FALSE))
+diam_mult_lm &lt;- lm(price ~ carat + cut_fct, data = diamonds)
+tidy(diam_mult_lm)
+```
+
+```
+##               term  estimate std.error statistic       p.value
+## 1      (Intercept) -3875.470  40.40824 -95.90790  0.000000e+00
+## 2            carat  7871.082  13.97963 563.03950  0.000000e+00
+## 3      cut_fctGood  1120.332  43.49923  25.75521 2.143864e-145
+## 4 cut_fctVery Good  1510.135  40.24008  37.52814 2.728234e-304
+## 5   cut_fctPremium  1439.077  39.86533  36.09846 5.613914e-282
+## 6     cut_fctIdeal  1800.924  39.34443  45.77329  0.000000e+00
+```
+---
+### Multiple regression
+
+How do we interpet the coefficients on `cut`?
+
+We would say that the mean price difference between Good and Fair diamonds is $1120. Similary, the mean price difference between Ideal and Fair diamonds is $1800.
+
+
+```
+##               term  estimate std.error statistic       p.value
+## 1      (Intercept) -3875.470  40.40824 -95.90790  0.000000e+00
+## 2            carat  7871.082  13.97963 563.03950  0.000000e+00
+## 3      cut_fctGood  1120.332  43.49923  25.75521 2.143864e-145
+## 4 cut_fctVery Good  1510.135  40.24008  37.52814 2.728234e-304
+## 5   cut_fctPremium  1439.077  39.86533  36.09846 5.613914e-282
+## 6     cut_fctIdeal  1800.924  39.34443  45.77329  0.000000e+00
+```
+---
+### Review
+
+What did we learn?
+
+- How we can interpret coefficients on numeric and categorical features
+
+- How we can determine the significance of a coefficient
+  + effect size
+  + p-values
+  
+- How we measure the model's goodness-of-fit with the `adjusted` `\(\large R^2\)`
+
+- Basic multiple regression
+
+---
+class: inverse, center, middle
+
+# End of Session 7.1
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

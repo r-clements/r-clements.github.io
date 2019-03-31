@@ -1,0 +1,259 @@
+---
+title: "Introduction to Data Science"
+subtitle: "Session 8.2"
+author: "Robert Clements"
+date: ""
+output:
+  xaringan::moon_reader:
+    css: rc_css.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(fig.align = "center", fig.asp=.5, message = FALSE, warning = FALSE)
+```
+
+### Session 8.2 Outline
+
+- Spatial Data
+  + *Modern Data Science with R - Chapter 14*
+---
+class: inverse, center, middle
+# Spatial Data
+---
+### Why spatial data?
+
+Example: Cholera in 1854 - back then it was believed that cholera was airborne. A physician named John Snow didn't buy it, and decided to dig into the data. The data might have looked like this:
+
+```{r, echo = FALSE}
+chol <- data.frame(Date = c('Aug 31, 1854', 'Aug 31, 1854', 'Oct 1, 1854'),
+                   Name = c('Thomas Jones', 'Mary Jones', 'Martin Warwick'),
+                   Address = c('26 Broad St', '26 Broad St', '14 Broad St'),
+                   Age = c(37, 11, 23), 
+                   Death = c('cholera', 'cholera', 'cholera'))
+chol
+```
+---
+### Why spatial data?
+
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE, fig.asp = .8}
+library(mdsr)
+library(ggmap)
+library(rgdal)
+m <- get_map('John Snow, London, England', zoom = 17, maptype = 'roadmap', source = 'google', urlonly = FALSE)
+proj4string(CholeraDeaths) <- CRS("+init=epsg:27700")
+cholera_latlong <- CholeraDeaths %>% spTransform(CRS("+init=epsg:4326"))
+snow <- ggmap(m) + geom_point(data = as.data.frame(cholera_latlong), aes(x = coords.x1, y = coords.x2, size = Count))
+snow
+```
+---
+### Spatial objects in R
+
+There are many types of spatial objects. `CholeraDeaths` is a `SpatialPointsDataFrame` object available in the `mdsr` R package. 
+
+```{r}
+library(mdsr)
+glimpse(CholeraDeaths)
+```
+---
+### Spatial objects in R
+
+Luckily, we can convert `CholeraDeaths` to a standard R data frame which will make plotting easier.
+
+```{r}
+cholera_df <- as.data.frame(CholeraDeaths)
+head(cholera_df)
+```
+---
+### Wait, what happened to our coordinates?
+
+When working with spatial data, we have to worry about **projections** - how do we convert locations in a 3-d geographic coordinate system to a 2-d representation. 
+.pull-left[
+Mercator preserves angles
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.asp = 1}
+library(maps)
+map("world", projection = 'mercator', wrap = TRUE)
+```
+]
+.pull-right[
+Gall-Peters preserves area
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.asp = 1}
+map("world", projection = 'cylequalarea', param = 45, wrap = TRUE)
+```
+]
+---
+### Google map tiles
+
+Google map tiles are returned to R using the `espg:4326` system, which is the standard for GPS systems. We need to project our `CholeraDeaths` coordinates onto the same system. 
+
+We can use the `spTransform()` and `CRS()` functions from the `rgdal` package to do this transformation. `spTransform` does the conversion, and `CRS` specifies the coordinate system using a smaller string.  
+
+But first, our cholera data is in the `epsg:27700` system. We need to tell R this by using the `proj4string()` function. Without this, we can't convert correctly.
+
+```{r}
+library(rgdal)
+# specify the system for our spatial data
+proj4string(CholeraDeaths) <- CRS("+init=epsg:27700")
+```
+---
+### Conversion
+```{r}
+# transform to new system
+cholera_latlong <- CholeraDeaths %>% spTransform(CRS("+init=epsg:4326"))
+head(cholera_latlong)
+```
+
+---
+### Create a data.frame with lat and long columns
+```{r}
+cholera_latlong <- as.data.frame(cholera_latlong)
+head(cholera_latlong)
+```
+---
+### Create a data.frame with lat and long columns
+```{r}
+cholera_latlong <- cholera_latlong %>% 
+  mutate(longitude = coords.x1, latitude = coords.x2)
+head(cholera_latlong)
+```
+---
+### Now we can plot it on a map
+
+We'll use the `ggmap` package to plot static maps.
+
+Unfortunately, we need an API key to do this. After installing `ggmap`, read the documentation by typing
+
+```{r, eval = FALSE}
+?register_google
+```
+
+**Not required**, but you can get your API key at:
+
+[https://cloud.google.com/maps-platform/](https://cloud.google.com/maps-platform/)
+
+---
+### Now we can plot it on a map
+
+First, we collect the map tiles using `get_map()`.
+Second, we use `ggplot` to plot the map and add our spatial coordinates as points.
+
+```{r, echo = TRUE, warning=FALSE, message=FALSE, fig.asp = .8, eval = FALSE}
+library(mdsr)
+library(ggmap)
+library(rgdal)
+
+# get map tiles
+m <- get_map('John Snow, London, England', zoom = 17, 
+             maptype = 'roadmap', source = 'google', urlonly = FALSE)
+
+snow <- ggmap(m) + 
+  geom_point(data = cholera_latlong, 
+             aes(x = longitude, y = latitude, size = Count))
+```
+---
+### Now we can plot it on a map
+
+```{r}
+snow
+```
+---
+### Geocoding
+
+Geocoding is the process of converting a human-readable address into geographic coordinates.
+
+We can get latitudes and longitudes from an address by using the `geocode()` function from the `ggmap` package. 
+
+```{r}
+library(ggmap)
+ucb_ext <- '160 Spear St, San Francisco, CA'
+geocode(ucb_ext)
+```
+---
+### Slippy Maps 
+
+A slippy map is a map with a tiled base layer, with panning and zooming and other features that you supply.
+
+```{r, echo = FALSE}
+library(leaflet)
+ucb_geo <- geocode(ucb_ext)
+map <- leaflet() %>%
+  addTiles() %>%
+  addMarkers(lng = ~lon, lat = ~lat, data = ucb_geo)
+map
+```
+---
+### Slippy Maps in R
+
+The `leaflet` R package is a wrapper for the `leaflet` javascript library. What that means is that we can use R to create slippy maps. Note that these are meant for **web maps**. You cannot interact with a map in *pdf* or *Word*. So, your homework this week will have to be turned in as an html file.
+
+```{r}
+library(leaflet)
+leaflet() %>% addTiles()
+```
+---
+### Slippy Maps in R
+
+Let's focus on SF
+
+```{r}
+leaflet() %>% 
+  setView(lng = -122.3937, lat = 37.79137, zoom = 14) %>%
+  addTiles()
+```
+---
+### Slippy Maps in R
+
+Let's add a marker for UC Berkeley Extension
+
+```{r}
+# geocode uc berkeley extension
+ucb_geo <- geocode(ucb_ext)
+
+map <- leaflet() %>%
+  addTiles() %>%
+  addMarkers(lng = ~lon, lat = ~lat, data = ucb_geo)
+
+map
+```
+---
+### Slippy Maps for spatial data
+
+If we have a set of latitudes and longitudes, `leaflet()` also takes a `data` argument.
+
+```{r}
+head(cholera_latlong)
+
+```
+---
+### Slippy Maps for spatial data
+
+If we have a set of latitudes and longitudes, `leaflet()` also takes a `data` argument.
+
+```{r}
+cholera <- leaflet(cholera_latlong) %>%
+  addTiles() %>%
+  addMarkers()
+```
+---
+### Slippy Maps for spatial data
+
+```{r}
+cholera
+```
+---
+### Play around with `leaflet()`
+
+You can add labels to the markers, you can add popups (`addPopups()`). Check out the examples from the help file.
+
+---
+class: inverse, center, middle
+
+# End of Session 8.2

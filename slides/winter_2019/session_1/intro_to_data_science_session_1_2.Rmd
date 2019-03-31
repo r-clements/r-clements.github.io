@@ -1,0 +1,226 @@
+---
+title: "Introduction to Data Science"
+subtitle: "Session 1.2"
+author: "Robert Clements"
+date: ""
+output:
+  xaringan::moon_reader:
+    css: rc_css.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+### Session 1.2 Outline
+
+- Examples of Real Data Science  
+
+- Defining Data Science and Data Scientists
+
+  + What is a Data Scientist?
+  + Data Science: the two paradigms
+
+- Resources  
+
+---
+class: inverse, center, middle
+
+# Examples of Real Data Science
+
+---
+### The NorCal Fires: [http://mazamascience.com/WorkingWithData/?p=1770](http://mazamascience.com/WorkingWithData/?p=1770)
+
+### Bitcoin map: [https://rud.is/b/2018/01/18/bitcoin-world-map-bubbles/](https://rud.is/b/2018/01/18/bitcoin-world-map-bubbles/)
+
+### Gender and Verbs: [http://varianceexplained.org/r/tidytext-gender-plots/](http://varianceexplained.org/r/tidytext-gender-plots/)
+
+---
+### Stitchfix: [https://multithreaded.stitchfix.com/blog/2017/09/08/time-dependent-classification/](https://multithreaded.stitchfix.com/blog/2017/09/08/time-dependent-classification/)
+
+### Airbnb: [Knowledge sharing at AirBnb](https://medium.com/airbnb-engineering/scaling-knowledge-at-airbnb-875d73eff091)
+
+### Twitter: [Anomaly detection R package](https://github.com/twitter/AnomalyDetection) 
+
+---
+class: inverse, center, middle
+
+# What is Data Science?
+
+---
+### What is data science?
+
+Data science entails:
+
+### *Data Exploration and Statistical Inference* 
+
+- exploring data for insights
+
+  + visualizations, data summaries
+
+- explaining what happened and describing properties of data
+
+  + hypothesis tests, statistical models 
+
+### *Predictive Modeling*
+
+- predicting what will happen and why
+
+  + machine learning and statistical models
+
+---
+### What is a data scientist?
+
+I want to hear what you think. 
+
+![](pics/moneyball.jpg)
+
+---
+### What is a data scientist?
+
+I want to hear what you think.
+
+You may have read job postings that list some or all of these skills:
+.pull-left[
+
+- Machine learning 
+- NLP
+- Software dev experience in Python, Java
+- Big data skills (Hadoop, Hive, Pig, Spark MapReduce)
+- Statistical modeling in R
+- Visualization in D3, Tableau
+- Communication skills
+- Domain expertise in the industry
+- Database design skills (SQL AND NoSQL)
+- Proactive, creative, go-getter
+
+
+]
+.pull-right[
+- Ability to turn insights into action
+- PhD or MS with 5+ years of experience
+
+![](pics/datascience_unicorn.png)
+]
+
+---
+### What is a data scientist?
+
+I want to hear what you think. 
+
+--
+
+Do we have to limit the definition to exclude:
+
+--
+
+Data analysts?
+
+--
+
+Statisticians?
+
+--
+
+Business Intelligence Analysts?
+
+--
+
+Data engineers?
+
+---
+### What is a data scientist?
+
+In general a data scientist:
+
+--
+
+- is a problem solver
+
+--
+
+- is a decent coder
+
+--
+
+- is proficient in math and stats
+
+--
+
+- is a good communicator
+
+--
+
+- is a curious person
+
+---
+### What is a data scientist?
+
+In general a data scientist:
+
+--
+
+- can come from many backgrounds
+  + technical and non-technical
+  + I've worked with people who were in Physics, Bioinformatics, Mechanical Engineering, Mathematics, Computer Science
+  + Some have PhD's, some have MA/MS's, and some have BA/BS's
+
+--
+
+- might use R, might prefer Python, might not care
+
+--
+
+- is excited about learning from data
+
+---
+
+### Data Science: the two paradigms
+
+### For Machines
+
+- Only thing that matters is predictive accuracy
+
+- Model can be complex, black box, and filled with uninterpretable features
+
+- Examples: Amazon & Netflix recommendations; FB news feed; Google translate
+
+### For Humans
+
+- What matters more is that humans can take action on the results
+
+- Model needs to be interpretable enough to know what to do with it
+
+- Examples: nearly everything I've worked on
+
+---
+class: inverse, center, middle
+
+# Resources
+
+---
+### Places for data science/machine learning projects and data
+
+.pull-left[
+- [Kaggle](https://www.kaggle.com/) - predictive modeling competitions
+
+- [Driven Data](https://www.drivendata.org/) - predictive modeling competitions with a social bent
+
+- [DataKind](http://www.datakind.org/) - data science volunteering
+![](https://blogs.informatica.com/perspectives/wp-content/uploads/2014/10/datakind.png)
+]
+.pull-right[
+![](https://www.kaggle.com/content/v/4e5085eca1ab/kaggle/img/logos/kaggle-logo-transparent-300.png)
+![](https://assets.datacamp.com/production/course_1032/shields/thumb/shield_image_course_1032_20160602-25-qcsucd?1477576504)
+
+]
+
+---
+class: inverse, center, middle
+
+# End of Session 1.2

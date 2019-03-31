@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Data Science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Robert Clements" />
+    <link rel="stylesheet" href="rc_css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Data Science
+## Session 10.2
+### Robert Clements
+
+---
+
+
+
+### Session 10.2 Outline
+
+- Shiny apps
+---
+class: inverse, center, middle
+# Shiny apps
+---
+### What is Shiny?
+
+`shiny` is an R package that makes it easy to build interactive web apps straight from R. You can host standalone apps on a webpage or embed them in R Markdown documents or build dashboards. You can also extend your Shiny apps with CSS themes, htmlwidgets, and JavaScript actions.
+
+You **do not need** to know `html`, `javascript` or `CSS` in order to build these apps. You only need to know `R`.
+
+Best way to learn is by doing some simple examples here:
+
+[https://shiny.rstudio.com/](https://shiny.rstudio.com/)
+---
+### Why bother?
+
+Why use Shiny when you can use Tableau, Spotfire, Excel, etc.?
+
+*Because Shiny has the power of R working behind it - meaning that almost anything you can do in R, you can do in a Shiny App.*
+
+- Complex data processing
+
+- Data exploration
+
+- Model fitting
+
+- Interactive visualizations
+
+---
+### Two components of a Shiny app
+
+- The UI (user interface) object - defines what you'll see in your browser
+
+- The server function - the code that takes inputs and creates outputs
+---
+### Let's run an example
+
+
+
+```r
+library(shiny)
+
+runExample('01_hello')
+```
+
+See [https://shiny.rstudio.com/articles/basics.html](https://shiny.rstudio.com/articles/basics.html) for the source code of the `01_hello` app.
+
+---
+### Now let's recreat the app from scratch
+
+Open a new R script and type in:
+
+
+```r
+library(shiny)
+ui &lt;- fluidPage(
+  # App title ----
+  titlePanel("Hello Shiny!")
+)
+
+server &lt;- function(input, output) {
+  # Empty server function
+}
+```
+---
+### Run the app
+
+
+```r
+shinyApp(ui, server)
+```
+---
+### Create the skeleton for the UI
+
+
+```r
+ui &lt;- fluidPage(
+  # App title ----
+  titlePanel("Hello Shiny!"),
+  
+  # Sidebar layout with input and output definitions ----
+  sidebarLayout(
+    
+    # Sidebar panel for inputs ----
+    sidebarPanel(
+    ),
+    
+    # Main panel for displaying outputs ----
+    mainPanel(
+    )
+  )
+)
+```
+---
+### Run the app
+
+
+```r
+shinyApp(ui, server)
+```
+---
+### Add a slider input to the UI
+
+
+```r
+ui &lt;- fluidPage(
+  # App title ----
+  titlePanel("Hello Shiny!"),
+  
+  # Sidebar layout with input and output definitions ----
+  sidebarLayout(
+    
+    # Sidebar panel for inputs ----
+    sidebarPanel(
+      # Input: Slider for the number of bins ----
+      sliderInput(inputId = "bins",
+                  label = "Number of bins:",
+                  min = 1,
+                  max = 50,
+                  value = 30)
+    ),
+    
+    # Main panel for displaying outputs ----
+    mainPanel(
+    )
+  )
+)
+```
+---
+### Add a plot output to the UI
+
+
+```r
+ui &lt;- fluidPage(
+  # App title ----
+  titlePanel("Hello Shiny!"),
+  
+  # Sidebar layout with input and output definitions ----
+  sidebarLayout(
+    
+    # Sidebar panel for inputs ----
+    sidebarPanel(
+      # Input: Slider for the number of bins ----
+      sliderInput(inputId = "bins",
+                  label = "Number of bins:",
+                  min = 1,
+                  max = 50,
+                  value = 30)
+    ),
+    
+    # Main panel for displaying outputs ----
+    mainPanel(
+      # Output: Histogram ----
+      plotOutput(outputId = "distPlot")
+    )
+  )
+)
+```
+---
+### Run the app
+
+
+```r
+shinyApp(ui, server)
+```
+---
+### Take a look at the `ui` object
+
+
+```r
+ui
+```
+---
+### Now let's work on the server code
+
+```r
+server &lt;- function(input, output) {
+  
+  # Load packages
+  library(tidyverse)
+}
+```
+---
+### Create our plot
+
+```r
+server &lt;- function(input, output) {
+  
+  # Load packages
+  library(tidyverse)
+  
+  # Histogram of the Old Faithful Geyser Data ----
+  # with requested number of bins
+  output$distPlot &lt;- renderPlot({
+
+  })
+}
+```
+---
+### Run the app
+
+
+```r
+shinyApp(ui, server)
+```
+---
+### Use the input from the slider to define the plot
+
+```r
+server &lt;- function(input, output) {
+  
+  # Load packages
+  library(tidyverse)
+  
+  # Histogram of the Old Faithful Geyser Data ----
+  # with requested number of bins
+  output$distPlot &lt;- renderPlot({
+    faithful %&gt;% ggplot(aes(x = waiting)) +
+      geom_histogram(bins = input$bins) +
+      theme_bw()
+  })
+}
+```
+---
+### Run the app
+
+
+```r
+shinyApp(ui, server)
+```
+---
+class: inverse, center, middle
+
+# End of Session 10.2
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

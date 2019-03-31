@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Data Science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Robert Clements" />
+    <link rel="stylesheet" href="rc_css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Data Science
+## Session 2.1
+### Robert Clements
+
+---
+
+
+
+
+### Housekeeping
+
+- The wait list: I cannot add you. Official policy is that you will be offered an open spot in the order you fall on the list, if spots are available.
+  + If a spot doesn't open soon, think about joining the class the next time it is offered.
+- RStudio, R and R package issues?
+  + Don't worry about masked functions or conflicts yet.
+  + RStudio Cloud is still an option for those who are frustrated.
+- Excused absences: if you know ahead of time, just let me know. You're still responsible for turning in the assignments.
+- The textbook: optional. Homework and exams will either be code- or lecture-based.
+- Any other questions?
+
+---
+### Session 2.1 Outline
+
+- Exploratory Data Analysis definition
+- People in Visualization
+- Software for Visualization
+- Importance of Visualization
+
+---
+class: inverse, center, middle
+
+# Exploratory Data Analysis
+
+---
+### EDA
+
+The goal of EDA is to summarise and explain certain attributes of the data and was popularized by John Tukey. This can be done with numbers, tables, statistical models, and graphics (our focus for this session).
+
+- Formulate hypotheses
+- Check assumptions for models and statistical tests
+- Data cleansing
+
+![](pics/tukey.jpg)
+
+---
+class: center, inverse, middle
+
+## "The simple graph has brought more information to the data analyst's mind than any other device." ~~Robert Clements~~ John Tukey
+
+---
+class: center, inverse, middle
+# People
+---
+## People
+
+### [Edward Tufte](https://www.edwardtufte.com/tufte/) - critic of powerpoint, evangelizer of sparklines and small multiples
+
+### John Tukey - inventor of the boxplot!!
+
+### [Flowing Data](http://flowingdata.com/) - blog by Nathan Yau
+
+---
+class: inverse, center, middle
+
+# Software?
+
+---
+### Software
+
+Obviously we will be using R, but even R has several options for visualization:
+
+- Base R graphics (no packages required)
+
+
+```r
+data(cars)
+plot(cars$speed, cars$dist)
+```
+
+&lt;img src="intro_to_data_science_session_2_1_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Software
+
+Obviously we will be using R, but even R has several options for visualization:
+
+- Lattice graphics
+
+
+```r
+data(cars)
+lattice::xyplot(dist ~ speed, data = cars)
+```
+
+&lt;img src="intro_to_data_science_session_2_1_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+### Software
+
+Obviously we will be using R, but even R has several options for visualization:
+
+- ggplot2 graphics
+
+
+```r
+library(ggplot2)
+data(cars)
+ggplot(cars, aes(x = speed, y = dist)) + geom_point()
+```
+
+&lt;img src="intro_to_data_science_session_2_1_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Others?
+
+### A bunch more in R
+### Python libraries
+### D3 - interactive javascript-based
+### Excel 
+### Tableau/Spotfire
+### What else??
+
+---
+class: inverse, center, middle
+# Importance of Visualization
+
+---
+## Challenger disaster
+
+Before the launch, Morton Thiokol and other engineers attempted to postpone the launch. They provided tables and charts, like the one below, as evidence that the O-Rings may fail. NASA wasn't convinced.
+
+![](pics/chart_junk.gif)
+http://www.stat.ucla.edu/~vlew/stat10/archival/FA00/handouts/graph110.html
+---
+### Challenger disaster
+
+Might graphics like this be more convincing?
+
+![](pics/challenger_scatter.jpg)
+http://visualjournalism.com/representation-and-misrepresentation-tufte-and-the-morton-thiokol-engineers-on-the-challenger/2011/03/23/
+
+---
+### When are graphics not important?
+
+There are situations where simply showing the raw numbers is just as effective, or even moreso, than showing a graphic. Just make sure the tables are very clearly labeled.
+
+- Univariate analyses
+  + summary statistics
+  + p-values
+  + scores/metrics
+- Structured numeric data in tables
+- When the numbers are needed as a reference
+
+Rule of thumb: if you need to visualize trends, relationships, or large amounts of data, then a graphic is usually better.
+
+---
+### Why do data scientists hate pie charts?
+
+&lt;img src="intro_to_data_science_session_2_1_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Sometimes a simple table is sufficient
+
+What's wrong with this?
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; substance &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; homeless &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; housed &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; alcohol &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.30 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; cocaine &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.38 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; heroin &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.32 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+class: inverse, center, middle
+
+# End of Session 2.1
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

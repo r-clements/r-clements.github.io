@@ -1,0 +1,332 @@
+---
+title: "Introduction to Data Science"
+subtitle: "Session 5.2"
+author: "Robert Clements"
+date: ""
+output:
+  xaringan::moon_reader:
+    css: rc_css.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(fig.align = "center", fig.asp=.5, message = FALSE, warning = FALSE)
+```
+
+### Session 5.2 Outline
+
+- EDA
+  + What I do when I get new data
+  + Velocity 2011 Talk: Look at your data
+  + Questions
+  + Variation
+  + Unusual and missing data
+  + *R for Data Science - Chapter 7*
+---
+class: inverse, center, middle
+[What I do when I get a new data set](https://simplystatistics.org/2014/06/13/what-i-do-when-i-get-a-new-data-set-as-told-through-tweets/)
+---
+class: inverse, center, middle
+[Look at your data (up to 14:50)](https://www.youtube.com/watch?v=coNDCIMH8bk)
+---
+class: inverse, center, middle
+# Exploratory Data Analysis
+---
+### EDA
+
+The goal of EDA is to summarise and explain certain attributes of the data and was popularized by John Tukey. This can be done with numbers, tables, statistical models, and graphics (our focus for this session).
+
+- Formulate hypotheses
+- Check assumptions for models and statistical tests
+- Data cleansing
+
+![](pics/tukey.jpg)
+---
+### Questions for EDA
+
+1. What does my data look like?  
+
+2. What is *in* my data?  
+
+3. What type of variation occurs in my data *within variables*?  
+
+4. What type of covariation occurs in my data *between variables*?  
+
+---
+### Some definitions we should already be familiar with
+
+- **Variable** - a quantity or quality that we can measure
+
+- **Value** - the measurement of the variable
+
+- **Observation** - set of measurements 
+
+- **Tidy data** - tabular data with rows of observations and columns of variables
+
+---
+### Variation
+
+Sometimes referred to as the **spread** of a variable, describes how a variable changes from measurement to measurement. If you measure any *continuous* value twice, you will get two different results. This occurs even when measuring constants (speed of light) due to small measurement error.
+
+What are some measures of **spread**?
+
+--
+
+Variance **(not robust)** - `var()`  
+
+$\Large \sigma^2 = \frac{1}{N} \sigma (X - \mu)^2$
+
+--
+
+Standard deviation **(not robust)** - `sd()`  
+
+$\Large \sigma = \sqrt{\sigma^2}$
+
+--
+
+Inter-quartile range **(robust)** - `IQR()`  
+
+$\Large IQR = Q3 - Q1$
+
+---
+### Robust?
+
+A **robust** statistic is a statistic that is *resistant* to outliers, meaning that if you remove or add outliers the measure will not change by a significant amount.
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+var_w_outliers <- data.frame(x = c(rnorm(1000, mean = 0, sd = 1), 20, 25, 30))
+var_w_outliers %>% ggplot(aes(x = x)) +
+  geom_histogram()
+```
+
+---
+### Robust?
+
+A **robust** statistic is a statistic that is *resistant* to outliers, meaning that if you remove or add outliers the measure will not change by a significant amount.
+
+```{r, message=FALSE, warning=FALSE}
+var_w_outliers %>% summarize(var = var(x), sd = sd(x), iqr = IQR(x))
+
+var_w_outliers %>% filter(x < 10) %>% summarize(var = var(x), sd = sd(x), iqr = IQR(x))
+```
+---
+### Variation
+
+Visualizing variation:
+
+- continuous variables - histogram
+
+- categorical variables - bar charts
+
+But what are we looking for??
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = carat)) +
+  geom_histogram(binwidth = 0.01)
+```
+---
+### Variation questions
+
+Good questions to ask yourself:
+
+- What are the typical values?
+
+- What is the general shape of the data?
+
+- What are the rare values? Why might they be rare?
+
+- Any unusual or expected patterns? What explains them?
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = carat)) +
+  geom_histogram(binwidth = 0.01)
+```
+---
+### Variation questions
+
+Typical values, or measures of **center**:
+
+- mean 
+- median
+- mode - most common value
+  + only measure of center that can be used with categorical variables
+
+### Which measures are robust?
+
+---
+### Variation questions
+
+The **shape**, or distribution, of data:
+
+- **symmetrical** - data centers around the mean/median
+- right-skewed
+- left-skewed
+- bimodal
+
+Example - IQ test scores are symmetrical
+
+```{r}
+data.frame(x = rnorm(1000)) %>% ggplot() +
+  geom_histogram(aes(x = x))
+```
+---
+### Variation questions
+
+The **shape**, or distribution, of data:
+
+- symmetrical
+- **right-skewed** - data has a long tail to the right
+- left-skewed
+- bimodal
+
+Example - earthquake magnitudes are right-skewed
+
+```{r}
+data.frame(x = rexp(1000)) %>% ggplot() +
+  geom_histogram(aes(x = x))
+```
+---
+### Variation questions
+
+The **shape**, or distribution, of data:
+
+- symmetrical
+- right-skewed
+- **left-skewed** - data has a long tail to the left
+- bimodal
+
+Example - SAT scores of applicants to in-demand universities
+
+```{r}
+data.frame(x = -rexp(1000)) %>% ggplot() +
+  geom_histogram(aes(x = x))
+```
+---
+### Variation questions
+
+The **shape**, or distribution, of data:
+
+- symmetrical
+- right-skewed 
+- left-skewed
+- **bi-/multi-modal** - two or more peaks of values
+
+Example - book prices (paperback vs hardcover or regular books vs textbooks)
+
+```{r}
+data.frame(x = c(rnorm(1000), rnorm(1000, mean = 4))) %>% ggplot() +
+  geom_histogram(aes(x = x))
+```
+---
+### Variation questions
+
+This plot suggests that there are subgroups in our data. Here we may ask:
+
+- Why do these subgroups exist?
+
+- How are observations in each subgroup like each other? How are they different from other subgroups?
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = carat)) +
+  geom_histogram(binwidth = 0.01)
+```
+---
+### Variation and unusual values
+
+The `y` variable in the `diamonds` data set is a measure of one dimension of the diamonds (in mm). The plot below does not explicitly show us that there are outliers (except for the fact the the x-axis has a wide range).
+
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = y)) +
+  geom_histogram(binwidth = 0.01)
+```
+
+---
+### Variation and unusual values
+
+We can zoom in to see the outliers.
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = y)) +
+  geom_histogram(binwidth = 0.5) +
+  coord_cartesian(ylim = c(0, 50))
+```
+---
+### Pop Quiz
+
+What are the exact values of these outliers? Use tidyverse functions to find them.
+
+```{r, eval = FALSE, echo = FALSE}
+diamonds %>% arrange(desc(y)) %>% head(5)
+```
+---
+### Outliers in more than one dimension
+
+Sometimes observations will appear completely normal when looked at in one dimension, but are unusual when looked at in two dimensions. Here, we see some diamonds that have unusual combinations of length and width. 
+
+```{r, echo = FALSE}
+ggplot(data = diamonds) +
+  geom_point(mapping = aes(x = x, y = y)) +
+  coord_cartesian(xlim = c(4, 11), ylim = c(4, 11))
+```
+---
+### Outliers in more than one dimension
+
+You might call these diamonds anomalies. Outlier, or **anomaly detection** seems easy in one or two dimensions. But what about more than two dimensions? Sometimes, detecting anomalies might be your goal. 
+Example: fraud detection 
+
+.center[![](pics/anom.png)]
+---
+### What do we do about outliers or unusual values?
+
+- Can you figure out exactly why they are there?
+  + If yes, you may be able to justify removing them (data entry error, rare observations that nobody cares about)
+  + If no, keep them for now and proceed to the next step
+  
+- Do your analysis with **and** without the outliers
+
+- Are the analysis results similar with **and** without them?
+  + If yes, you can often remove these (replace them with NA) and move on
+  + If no, be careful about dropping them without a very good reason, and make sure to disclose this in your report
+---
+### Should we drop the entire observation due to outliers?
+
+Not usually, the other variables might be perfectly valid. 
+
+It is better to replace the values with NA using `mutate()` and `ifelse()`.
+
+`ifelse(if condition, what to replace with if TRUE, what to replace with if condition is FALSE)`
+
+```{r}
+diamonds2 <- diamonds %>% 
+  mutate(y = ifelse(y < 3 | y > 20, NA, y))
+```
+---
+### What to do with observations/variables with LOTS of missing values?
+
+This is more of an art than a science.
+
+Options: 
+
+1. Leave them alone
+2. Create a new 'MISSING' category in categorical variables (use `mutate()` and `ifelse()`)
+  + If continuous, you can categorize (bin) it (use `mutate()` and `cut()`)
+2. Drop variables with > n% missing values
+3. Drop observations with > m% missing values
+4. Imputation! Replace NA with an educated guess
+  + This is a broad field. **We won't be doing this in here**
+
+.center[![](pics/art-and-science.jpg)]
+
+---
+class: inverse, center, middle
+
+# End of Session 5.2

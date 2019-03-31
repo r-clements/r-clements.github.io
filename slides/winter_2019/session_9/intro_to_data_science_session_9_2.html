@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Data Science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Robert Clements" />
+    <link rel="stylesheet" href="rc_css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Data Science
+## Session 9.2
+### Robert Clements
+
+---
+
+
+
+
+### Session 9.2 Outline
+
+- A/B Testing
+  + What is A/B Testing
+  + The Binomial Distribution
+  + Hypothesis Testing
+  + Errors
+  
+---
+class: inverse, center, middle
+# What is A/B Testing
+---
+### A/B Testing
+
+Typically used for web analytics, A/B testing is a randomized experiment with two variants of a webpage. We want to know which version of the webpage is *more effective*. For today, we will measure *more effective* as the conversion rate (percentage of visitors who converted).
+
+We may also care about:
+
+- revenue/user
+- transactions/user
+- number of purchases/user
+- click-through rate
+
+---
+### A/B Testing
+
+Imagine we have our current version of a webpage, and we change some detail about it (this could be anything from style, layout, wordings, etc.). We then randomly send half of our traffic to Version A and the other half to Version B.
+
+.center[![](pics/what-ab-test.png)]
+
+---
+### A/B Testing
+
+Ok, from this graphic, version A had a higher conversion rate than version B, so we're done, right? Version A is better?
+
+.center[![](pics/what-ab-test.png)]
+---
+### The Sample Statistic
+
+Recall that we often want to estimate a parameter using a sample statistic, and that statistics have variability!
+
+
+We want to know `\(\large p_{A}\)` and `\(\large p_{B}\)`: the true conversion rates for the entire population for Version A and Version B
+
+
+We estimate this using `\(\large \hat{p}_{A}\)` and `\(\large \hat{p}_{B}\)`: the conversion rates from a sample of visitors to Version A and Version B
+---
+### The Sample Statistic
+
+If we take a new sample, these rates will be different. The question we need to answer is: are these rates significantly different from each other given what we know about variability and standard error?
+
+.center[![](pics/what-ab-test.png)]
+---
+### The Sampling Distribution for Proportions
+
+Conversion rates are proportions (what proportion of visitors converted). Sample proportions have a very common sampling distribution.
+
+&lt;img src="intro_to_data_science_session_9_2_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Sampling Distribution for Proportions
+
+Theoretically, 
+
+`\(\large p =\)` population proportion
+
+`\(\large \hat{p} =\)` sample proportion
+
+`$$\large \hat{p} \sim N\left(p, \sqrt{\frac{p(1-p)}{n}}\right)$$`
+  
+The standard error of `\(\large \hat{p}\)` is
+
+`$$\large \sqrt{\frac{p(1-p)}{n}}$$`
+  
+as long as `\(\large np \geq 10\)` and `\(\large n(1-p) \geq 10\)`
+
+---
+### Samples from A and B
+
+Suppose we have:
+
+- A and B versions of our webpage
+- True conversion rate for version A = .05
+- True conversion rate for version B = .05
+- Sample of size 1000 for each version
+
+and we want to simulate sample conversion rates. We can use the `rbinom()` function.
+
+
+```r
+true_a &lt;- .05
+true_b &lt;- .05
+n_a &lt;- 1000
+n_b &lt;- 1000
+```
+---
+class: inverse, center, middle
+# The Binomial Distribution
+---
+### The binomial distribution
+
+Suppose we have a process (such as flipping a coin) that only has two possible outcomes (failure and success), and that the outcome we are interested in happens with a constant probability of `\(\large p\)`. And suppose we observe `\(\large n\)` number of trials of that process.
+
+Let `\(\large X\)` be the number of successes we observe out of those `\(\large n\)` trials.
+
+Example:
+
+We flip a fair coin 100 times. The *success* in this case is landing on heads. The probability of landing on heads is 0.5. The number of heads, out of 100 coin flips, follows a binomial distribution with `\(\large n = 100, p = 0.5\)`.
+
+---
+### The binomial distribution
+
+OR...
+
+Suppose we have 1000 visitors each to our Version A and B webpages, and a *success* in this case is that the visitor converts. Also suppose the probability of conversion is constant. Then
+
+`\(\large X_{A}:\)` the number of version A visitors who convert, and 
+`\(\large X_{B}:\)` the number of version B visitors who convert
+
+follow Binomial distributions, with `\(\large n = 1000\)`, and `\(\large p =\)` probability of conversion.
+
+---
+### The binomial distribution
+
+`\(\large X_{A}\)` follows a binomial distribution that looks like this:
+
+&lt;img src="intro_to_data_science_session_9_2_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+### The binomial distribution
+
+If we know the true probability that a visitor converts, we can simulate our sample conversion rate.
+
+
+
+```r
+true_a &lt;- .05
+true_b &lt;- .05
+n_a &lt;- 1000
+n_b &lt;- 1000
+
+# this part will simulate how many conversions there are
+# for our 1000 visitors, when we know the true conversion rates
+# n = 1 because we only want one sample conversion rate
+samp_a &lt;- rbinom(n = 1, size = n_a, prob = true_a)
+samp_b &lt;- rbinom(n = 1, size = n_b, prob = true_b)
+```
+
+---
+### The binomial distribution
+
+If we know the true probability that a visitor converts, we can simulate our sample conversion rate.
+
+
+```r
+samp_a/n_a
+```
+
+```
+## [1] 0.047
+```
+
+```r
+samp_b/n_b
+```
+
+```
+## [1] 0.048
+```
+---
+### Empirical sampling distribution
+
+Now, lets run the simulation 1000 times to see the empirical sampling distribution:
+
+
+```r
+m &lt;- 1000
+
+samp_a &lt;- rbinom(n = m, size = n_a, prob = true_a)
+samp_b &lt;- rbinom(n = m, size = n_b, prob = true_b)
+
+head(samp_a)
+```
+
+```
+## [1] 59 37 50 48 41 54
+```
+
+```r
+head(samp_b)
+```
+
+```
+## [1] 52 54 56 51 56 53
+```
+---
+### Empirical sampling distribution
+
+Now, lets run the simulation 1000 times to see the empirical sampling distribution:
+
+
+```r
+plot_data &lt;- as_tibble(list(samp_a = samp_a/n_a, samp_b = samp_b/n_b))
+plot_data %&gt;% ggplot(aes(x = samp_a)) +
+  geom_histogram(binwidth = .001) +
+  xlab('Sample proportions for Version A') +
+  theme_bw()
+```
+
+&lt;img src="intro_to_data_science_session_9_2_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Empirical sampling distribution
+
+Now, lets run the simulation 1000 times to see the empirical sampling distribution:
+
+
+```r
+plot_data %&gt;% ggplot(aes(x = samp_b)) +
+  geom_histogram(binwidth = .001) +
+  xlab('Sample proportions for Version B') +
+  theme_bw()
+```
+
+&lt;img src="intro_to_data_science_session_9_2_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Pop Quiz
+
+What happens to our sampling distibution if our number of visitors decreases? Increases? What does that mean for our standard error?
+
+`$$\large \sqrt{\frac{p(1-p)}{n}}$$`
+
+---
+class: inverse, center, middle
+# Hypothesis Testing
+---
+### Hypothesis Testing
+
+Suppose we wanted to test the hypothesis that the conversion rate for version A is different than 0.1. 
+
+We have our null hypothesis that the conversion rate (proportions) =0.1, versus the alternative hypothesis that it is either:
+
+- not equal to 0.1
+- greater than 0.1
+- less than 0.1
+
+Null:
+
+`$$\large H_{0}: p_{A} = 0.1$$`
+
+Alternatives:
+
+`$$\large H_{alt}: p_{A} \neq 0.1$$`
+`$$\large H_{alt}: p_{A} &gt; 0.1$$`
+`$$\large H_{alt}: p_{A} &lt; 0.1$$`
+---
+### Hypothesis testing fundamental idea
+
+Let's assume the null is true, and then see how likely our sample proportion is given the null is true.
+
+If null is true, then our sampling distribution is
+
+&lt;img src="intro_to_data_science_session_9_2_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Hypothesis testing fundamental idea
+
+Let's assume the null is true, and then see how likely our sample proportion is given the null is true.
+
+What if our sample proportion is 0.09?
+
+&lt;img src="intro_to_data_science_session_9_2_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Hypothesis testing fundamental idea
+
+Let's assume the null is true, and then see how likely our sample proportion is given the null is true.
+
+What if our sample proportion is 0.07?
+
+&lt;img src="intro_to_data_science_session_9_2_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Hypothesis testing fundamental idea
+
+Let's assume the null is true, and then see how likely our sample proportion is given the null is true.
+
+What if our sample proportion is 0.05?
+
+&lt;img src="intro_to_data_science_session_9_2_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Return of the p-value
+
+Ok, visuals are fine, but we need an objective measure of how likely, or unlikely, it is to observe our sample proportion if the null is true. The p-value works fine for this.
+
+Recall the definition: the p-value is the probability of observing a statistic as extreme, or more extreme, than what we got, if the null is true. If p-value &lt; `\(\large \alpha\)`, we reject the null hypothesis.
+
+---
+### Return of the p-value
+
+The p-value is the area under the curve (depending on your alternative hypothesis).
+
+&lt;img src="intro_to_data_science_session_9_2_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+### Return of the p-value
+
+Luckily, we don't have to deal with z-tables or calculating p-values ourselves. We are doing a hypothesis test of proportions, so we can use the `prop.test()` function to perform the test and extract the p-value.
+
+To use `prop.test()` we need:
+
+- x: number of successes
+- n: size of the sample
+- p: our null hypothesis value
+- alternative: default is `\(\large \neq\)`
+- conf.level: `\(\large 1 - \alpha\)`, default is 0.95
+
+
+```r
+# x is number of successes (conversions)
+# n is size of sample
+# p is our null hypothesized value
+prop_test &lt;- prop.test(x = 50, n = 1000, p = .10)
+```
+---
+### Hypothesis tests for proportions in R
+
+
+```r
+class(prop_test)
+```
+
+```
+## [1] "htest"
+```
+
+```r
+names(prop_test)
+```
+
+```
+## [1] "statistic"   "parameter"   "p.value"     "estimate"    "null.value" 
+## [6] "conf.int"    "alternative" "method"      "data.name"
+```
+
+```r
+prop_test$p.value
+```
+
+```
+## [1] 1.811017e-07
+```
+
+The p-value is small (less than some value `\(\large \alpha\)` that we choose, typically 0.05), so we decide that our null hypothesis is wrong, and that the true conversion rate **IS NOT** 0.1.
+---
+### Pop Quiz
+
+Use the code below to help you simulate a sample of 1000 visitors, where the true conversion rate is .05, and then test these hypotheses:
+
+- the conversion rate is .05
+- the conversion rate is .06, .07, .08
+
+What did you notice?
+
+
+```r
+samp_a &lt;- rbinom(n = 1, size = 1000, p = ___)
+
+samp_a
+
+prop_test_05 &lt;- prop.test(x = ___, n = 1000, p = ___)
+prop_test_06 &lt;- prop.test(x = ___, n = 1000, p = ___)
+prop_test_07 &lt;- prop.test(x = ___, n = 1000, p = ___)
+prop_test_08 &lt;- prop.test(x = ___, n = 1000, p = ___)
+
+prop_test_05$p.value
+prop_test_06$p.value
+prop_test_07$p.value
+prop_test_08$p.value
+```
+---
+### We want to test whether our two sample conversion rates are significantly different
+
+We have our null hypothesis that the two conversion rates (proportions) are equal, versus the alternative hypothesis that they are either:
+
+- not equal
+- conversion rate for version A &gt; version B
+- conversion rate for version A &lt; version B
+
+Null:
+
+`$$\large H_{0}: p_{A} = p_{B}$$`
+
+Alternatives:
+
+`$$\large H_{alt}: p_{A} \neq p_{B}$$`
+`$$\large H_{alt}: p_{A} &gt; p_{B}$$`
+`$$\large H_{alt}: p_{A} &lt; p_{B}$$`
+---
+### The alternative hypothesis
+
+The alternative hypothesis you choose is problem-specific, but to make it easy, we will always be testing versus the alternative hypothesis that `\(\large p_{A} \neq p_{B}\)`.
+---
+### The hypothesis test - redefined
+
+Since we want to *compare* two sample proportions to each other, we need to redefine our hypotheses to make it work.
+
+Null:
+
+`$$\large H_{0}: p_{A} - p_{B} = 0$$`
+
+Alternatives:
+
+`$$\large H_{alt}: p_{A} - p_{B} \neq 0$$`
+`$$\large H_{alt}: p_{A} - p_{B} &gt; 0$$`
+`$$\large H_{alt}: p_{A} - p_{B} &lt; 0$$`
+---
+### The hypothesis test - redefined
+
+Guess what we have to think about now? Yes, what is the sampling distribution for the difference of two sample proportions?
+
+Luckily, it is simple:
+
+`$$\large \hat{p}_{A} - \hat{p}_{B} \sim N\left(p_{A}-p_{B}, \sqrt{\frac{p_{A}(1-p_{A})}{n_{A}} + \frac{p_{B}(1-p_{B})}{n_{B}}}\right)$$`
+---
+### Hypothesis testing fundamental idea
+
+Let's assume the null is true, and then see how likely our sample proportion is given the null is true.
+
+If null is true, then our sampling distribution is
+
+&lt;img src="intro_to_data_science_session_9_2_files/figure-html/unnamed-chunk-17-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Hypothesis testing fundamental idea
+
+Let's assume the null is true, and then see how likely our sample proportion is given the null is true.
+
+What if the difference in our sample proportions is 0.01?
+
+&lt;img src="intro_to_data_science_session_9_2_files/figure-html/unnamed-chunk-18-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Hypothesis testing fundamental idea
+
+Let's assume the null is true, and then see how likely our sample proportion is given the null is true.
+
+What if the difference in our sample proportions is -0.01?
+
+&lt;img src="intro_to_data_science_session_9_2_files/figure-html/unnamed-chunk-19-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Hypothesis testing fundamental idea
+
+Let's assume the null is true, and then see how likely our sample proportion is given the null is true.
+
+What if the difference in our sample proportions is -.05?
+
+&lt;img src="intro_to_data_science_session_9_2_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
+---
+### A/B testing in R
+
+We can use the same `prop.test()` function to compare two proportions to each other!
+
+
+```r
+true_a &lt;- .05
+true_b &lt;- .05
+n_a &lt;- 1000
+n_b &lt;- 1000
+
+# this part will simulate how many conversions there are
+# for our 1000 visitors, when we know the true conversion rates
+# n = 1 because we only want one sample conversion rate
+set.seed(10)
+samp_a &lt;- rbinom(n = 1, size = n_a, prob = true_a)
+samp_b &lt;- rbinom(n = 1, size = n_b, prob = true_b)
+```
+---
+### A/B testing in R
+
+The p-value below tells us that the conversion rates for Version A and B are not significantly different than each other, so we'd conclude here that whatever changes were made to the webpage had no effect.
+
+
+```r
+samp_a
+```
+
+```
+## [1] 43
+```
+
+```r
+samp_b
+```
+
+```
+## [1] 53
+```
+
+```r
+two_prop_test &lt;- prop.test(c(samp_a, samp_b), c(1000, 1000))
+two_prop_test$p.value
+```
+
+```
+## [1] 0.3464841
+```
+---
+### A/B testing in R
+
+Do it again, but let's now change the true conversion rate for version B to 0.1.
+
+
+```r
+true_a &lt;- .05
+true_b &lt;- .10
+n_a &lt;- 1000
+n_b &lt;- 1000
+
+# this part will simulate how many conversions there are
+# for our 1000 visitors, when we know the true conversion rates
+# n = 1 because we only want one sample conversion rate
+set.seed(10)
+samp_a &lt;- rbinom(n = 1, size = n_a, prob = true_a)
+samp_b &lt;- rbinom(n = 1, size = n_b, prob = true_b)
+```
+---
+### A/B testing in R
+
+The p-value below tells us that the conversion rates for Version A and B **are** significantly different than each other, so we'd conclude here that whatever changes were made to the webpage **did have** an effect.
+
+
+```r
+samp_a
+```
+
+```
+## [1] 43
+```
+
+```r
+samp_b
+```
+
+```
+## [1] 101
+```
+
+```r
+two_prop_test &lt;- prop.test(c(samp_a, samp_b), c(1000, 1000))
+two_prop_test$p.value
+```
+
+```
+## [1] 8.188291e-07
+```
+---
+### Pop Quiz
+
+Run the code below about a dozen times and see if you notice anything unusual.
+
+
+```r
+true_a &lt;- .05
+true_b &lt;- .05
+n_a &lt;- 1000
+n_b &lt;- 1000
+
+# this part will simulate how many conversions there are
+# for our 1000 visitors, when we know the true conversion rates
+# n = 1 because we only want one sample conversion rate
+samp_a &lt;- rbinom(n = 1, size = n_a, prob = true_a)
+samp_b &lt;- rbinom(n = 1, size = n_b, prob = true_b)
+two_prop_test &lt;- prop.test(c(samp_a, samp_b), c(1000, 1000))
+two_prop_test$p.value
+```
+---
+class: inverse, center, middle
+# Hypothesis Test Errors
+---
+### Errors 
+
+From the previous pop quiz you should have noticed that sometimes you actually do conclude that the conversion rates are different, even though we know they are the same. We made an error.
+
+There are two types of errors when doing hypothesis testing:
+
+- Type I error: we rejected the null hypothesis, but we shouldn't have (null was true)
+
+- Type II error: we didn't reject the null hypothesis, but we should have (alternative was true)
+
+---
+### Errors
+
+Easy way to remember which is which:
+
+`$$\large H_{0}:$$`
+`$$\large H_{alt}:$$`
+
+- We made an error -&gt; Null hypothesis was true -&gt; Type I error
+- We made an error -&gt; Alternative hypothesis was true -&gt; Type II error
+---
+### Errors
+
+Each type of error has a certain *probability* of occurring. The probability of a type I error is `\(\large \alpha\)`. Think about that for a second...
+
+We won't discuss the probability of a Type II error...
+---
+### Long-running experiment
+
+We may want to check the result of our A/B test over time, so we'll be looking at results of a hypothesis test over time, as our sample size gets bigger, and the number of conversions increases.
+
+What do you think our test results might look like over time? Do you think they'll always lead to the same conclusion?
+---
+### Long-running experiment
+
+&lt;img src="intro_to_data_science_session_9_2_files/figure-html/unnamed-chunk-26-1.png" style="display: block; margin: auto;" /&gt;
+---
+class: inverse, center, middle
+
+# End of Session 9.2
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

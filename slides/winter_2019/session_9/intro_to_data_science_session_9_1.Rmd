@@ -1,0 +1,262 @@
+---
+title: "Introduction to Data Science"
+subtitle: "Session 9.1"
+author: "Robert Clements"
+date: ""
+output:
+  xaringan::moon_reader:
+    css: rc_css.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(fig.align = "center", fig.asp=.5, message = FALSE, warning = FALSE)
+```
+### Housekeeping
+
+- Final exam (homework) is cumulative (including today's material) and will be in two parts:
+
+  + Take home portion assigned today in place of a homework assignment (Due by Friday April 5 at noon)
+  
+  + In class portion will be completed in class on the last day (Apr 2), and due in class by 9:30PM. 
+  
+  + You will not have access to course materials on Canvas a few days after the course ends. 
+
+- Any questions?
+
+---
+### Session 9.1 Outline
+
+- Regression with categorical variables
+- Time series
+  
+---
+class: inverse, center, middle
+# Categorical Variables
+---
+### How do we include categorical variables in a regression model?
+
+$$\large \hat{f}(X) = \hat{\beta}_{0} + \hat{\beta}_{1}X_{1} + \hat{\beta}_{2}X_{2} + \ldots + \hat{\beta}_{p}X_{p}$$
+---
+### Encoding categorical variables
+
+There are many ways to encode categorical variables:
+
+- Assign each category a number (Ideal = 1, Premium = 2, etc.)
+
+- Supervised encoding (we won't go over these)
+
+- Dummy variables/one-hot encoding (create several 0/1 variables) 
+---
+### Dummy variables
+
+Suppose $\large X_{1}$ is a categorical variable with $\large k$ categories. We create $\large k-1$ dummy variables.
+
+For example: `cut` from the diamonds data has 5 categories: `{Ideal, Premium, Good, Very Good, Fair}`
+
+We can create 4 dummy variables as follows:
+
+- cut_good = 1 if cut is Good, 0 otherwise
+- cut_ideal = 1 if cut is Ideal, 0 otherwise
+- cut_premium = 1 if cut is Premium, 0 otherwise
+- cut_very_good = 1 if cut is Very Good, 0 otherwise
+---
+### Dummy variables
+
+```{r echo = FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(broom)
+library(knitr)
+diamonds %>% select(cut) %>% head(9) %>% data.frame()
+diamonds <- diamonds %>% mutate(cut_fct = factor(cut, ordered = FALSE))
+diamonds_dummys <- model.matrix(~cut_fct, diamonds) %>% as_tibble()
+diamonds_dummys %>% select(-`(Intercept)`) %>% head(9) %>% data.frame()
+```
+
+---
+### Dummy variables
+
+This is what `lm()` will do to an unordered factor by default.
+
+So that this:
+
+$$\large \hat{Price} = \hat{\beta_{0}} + \hat{\beta_{1}} \times cut$$
+
+becomes this:
+
+$$\large \hat{Price} = \hat{\beta_{0}} + \hat{\beta_{1}} \times Good + \hat{\beta_{2}} \times VeryGood + \hat{\beta_{3}} \times Premium + \hat{\beta_{4}} \times Ideal$$
+---
+### Dummy variables
+
+```{r}
+mod_1 <- lm(price ~ cut_fct, data = diamonds)
+tidy(mod_1)
+```
+---
+### What happens when `cut = Fair`?
+
+`Fair` is our reference category, so each of the other category's coefficients are interpreted in relation to `Fair`, and each of our dummy variables equals zero.
+
+So this
+
+$$\large \hat{Price} = \hat{\beta_{0}} + \hat{\beta_{1}} \times Good + \hat{\beta_{2}} \times VeryGood + \hat{\beta_{3}} \times Premium + \hat{\beta_{4}} \times Ideal$$
+
+is equivalent to this
+
+$$\large \hat{Price} = \hat{\beta_{0}}$$
+---
+### What happens when `cut = Good`?
+
+$$\large \hat{Price} = \hat{\beta_{0}} + \hat{\beta_{1}} \times Good + \hat{\beta_{2}} \times VeryGood + \hat{\beta_{3}} \times Premium + \hat{\beta_{4}} \times Ideal$$
+
+is equivalent to this
+
+$$\large \hat{Price} = \hat{\beta_{0}} + \hat{\beta_{1}}$$
+
+and we interpret $\large \hat{\beta_{1}}$ as the mean difference in `Price` between `Fair` and `Good` diamonds. 
+---
+class: inverse, center, middle
+
+# Time Series Analysis
+---
+### Time Series Decomposition
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+library(tidyverse)
+library(tseries)
+daily_data <- read_csv('../../demos/session_8/day.csv')
+
+daily_data$Date = as.Date(daily_data$dteday)
+count_ts = ts(daily_data %>% select(cnt)) 
+
+daily_data <- daily_data %>% mutate(clean_cnt = tsclean(count_ts))
+daily_data <- daily_data %>% mutate(cnt_ma7 = ma(clean_cnt, order = 7),
+                                    cnt_ma30 = ma(clean_cnt, order = 30))
+
+ggplot(daily_data, aes(Date, cnt)) + geom_line() + scale_x_date('month')  + ylab("Daily Bike Checkouts") +
+            xlab("")
+```
+---
+### Time Series Decomposition
+
+We often break a time series down by its
+
+- trend: the overall pattern of the series (increasing, decreasing, non-seasonal cycles)
+- seasonality: fluctuations over the calendar cycle
+- error/residual: everything else
+
+$$\large Y_t = S_t + T_t + E_t$$
+---
+### Time Series Decomposition
+
+We can use the `stl()` function in base R to do this.
+
+If we think a `week` is a natural unit of time:
+
+```{r, fig.asp = .6}
+# Convert to time series object
+# frequency is number of observations/time unit
+cln_cnt <- ts(as.vector(daily_data$clean_cnt), frequency=7)
+# decompose
+decomp <- stl(cln_cnt, s.window = "periodic")
+plot(decomp)
+```
+---
+### Time Series Decomposition
+
+We can use the `stl()` function in base R to do this.
+
+If we think a `month` is a natural unit of time:
+
+```{r, fig.asp = .6}
+# Convert to time series object
+# frequency is number of observations/time unit
+cln_cnt <- ts(as.vector(daily_data$clean_cnt), frequency=30)
+# decompose
+decomp <- stl(cln_cnt, s.window = "periodic")
+plot(decomp)
+```
+---
+### Time Series Decomposition
+
+We can use the `stl()` function in base R to do this.
+
+If we think a `quarter` is a natural unit of time:
+
+```{r, fig.asp = .6}
+# Convert to time series object
+# frequency is number of observations/time unit
+cln_cnt <- ts(as.vector(daily_data$clean_cnt), frequency=90)
+# decompose
+decomp <- stl(cln_cnt, s.window = "periodic")
+plot(decomp)
+```
+---
+### Time Series Decomposition
+
+We can use the `stl()` function in base R to do this.
+
+If we think a `half-year` is a natural unit of time:
+
+```{r, fig.asp = .6}
+# Convert to time series object
+# frequency is number of observations/time unit
+cln_cnt <- ts(as.vector(daily_data$clean_cnt), frequency=180)
+# decompose
+decomp <- stl(cln_cnt, s.window = "periodic")
+plot(decomp)
+```
+---
+### Time Series Decomposition
+
+We can use the `stl()` function in base R to do this.
+
+If we think a `year` is a natural unit of time:
+
+```{r, fig.asp = .6}
+# Convert to time series object
+# frequency is number of observations/time unit
+cln_cnt <- ts(as.vector(daily_data$clean_cnt), frequency=360)
+# decompose
+decomp <- stl(cln_cnt, s.window = "periodic")
+plot(decomp)
+```
+---
+### Time Series Decomposition
+
+```{r}
+class(decomp)
+names(decomp)
+head(decomp$time.series)
+```
+---
+### Time Series Decomposition
+
+```{r echo=FALSE}
+decomp_series <- as_tibble(decomp$time.series)
+decomp_series <- decomp_series %>% mutate(decomp_sum = seasonal + trend + remainder, clean_cnt = as.vector(daily_data$clean_cnt))
+head(decomp_series)
+```
+---
+### Dynamic Time Series Plots
+
+We can use the `dygraphs` R package to create interactive time series plots. The package provides functions that are wrappers around the dygraphs javascript library.
+
+```{r}
+library(dygraphs)
+dygraph(data = daily_data$clean_cnt,
+        xlab = 'Day',
+        ylab = 'Bicycle Count')
+```
+---
+class: inverse, center, middle
+
+# End of Session 9.1

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Data Science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Robert Clements" />
+    <link rel="stylesheet" href="rc_css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Data Science
+## Session 6.4
+### Robert Clements
+
+---
+
+
+
+
+### Session 6.4 Outline
+
+- Statistical learning
+  + Regression
+  + *Modern Data Science with R - Chapter 7.5-7.6*
+  + *Introduction to Statistical Learning - Chapter 2.1 &amp; 3.1*
+---
+class: inverse, center, middle
+# Statistical Learning
+---
+### Why statistical learning?
+
+EDA and visualization are powerful tools, but they only work well with a limited number of variables - there is only so much information our eyes can process.
+
+Also recall that humans are good at seeing patterns that aren't there, so we need tools that can extract patterns from random noise and *explain* the variation in our data. Note though that statistical and machine learning models often will make the same mistake as humans and identify spurious correlations.
+
+We can use statistical learning to identify and explain relationships between variables, as well as for prediction.
+
+---
+### Some notation:
+
+X: our set of predictors, explanatory variables, independent variables, or *features.* - these are the inputs to the model.
+
+Y: our response, dependent variable or *target* - the thing we're interested in predicting or explaining.
+
+Residuals: the difference between the predicted value (according to our regression model) and the actual value. residual = observed - predicted
+
+Relationship between Y and X:
+
+`$$\Huge Y \sim f(X) + \epsilon$$`
+
+where 
+
+`$$\Huge \epsilon = \mbox{random noise}$$`
+---
+### Why statistical learning (why estimate f(X))?
+
+.center[Inference vs Prediction]
+
+**Inference**: understanding the way our Y variable is influenced by changes in our X variables.
+
+- What features are associated with the target?
+- What is the relationship between each feature and our target?
+- Are the relationships adequately summarized linearly, or is it a more complex relationship?
+
+
+**Prediction**: predicting values of Y given new values of X. 
+---
+### Estimating f
+
+**Parametric** 
+
+`$$\huge f(X) = \beta_{0} + \beta_{1}X_{1} + \beta_{2}X_{2} + \ldots + \beta_{p}X_{p}$$`
+
+--
+
+And **non-parametric**
+
+`$$\huge f(X) = \mbox{something you can't parameterize}$$`
+---
+### Simple Linear Regression
+
+With simple linear regression, we assume a linear relationship between X and Y.
+
+**Parametric** 
+
+`$$\huge f(X) = \beta_{0} + \beta_{1}X_{1} + \beta_{2}X_{2} + \ldots + \beta_{p}X_{p}$$`
+
+We would love to know all of the `\(\Huge \beta\)` values, but we won't, so we estimate them:
+
+`$$\huge \hat{f}(X) = \hat{\beta}_{0} + \hat{\beta}_{1}X_{1} + \hat{\beta}_{2}X_{2} + \ldots + \hat{\beta}_{p}X_{p}$$`
+---
+### Regression
+
+We are interested in the relationship between *price* and *carat*, with *price* as our target.
+
+&lt;img src="intro_to_data_science_session_6_4_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Regression
+
+We are interested in the relationship between *price* and *carat*, with *price* as our target.
+
+&lt;img src="intro_to_data_science_session_6_4_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Regression
+
+We are interested in the relationship between *price* and *carat*, with *price* as our target.
+
+Regression model:
+`$$\Huge \mbox{price} = -2256 + 7756 \times \mbox{carat}$$`
+
+&lt;img src="intro_to_data_science_session_6_4_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Regression
+
+How did we estimate this function?
+
+`$$\Huge \mbox{price} = -2256 + 7756 \times \mbox{carat}$$`
+
+We minimized the sum of the residuals (squared). Recall 
+
+residuals = observed value - predicted value
+
+The observed values of price are given in the data. The predicted values of price come from our function.
+
+&lt;img src="intro_to_data_science_session_6_4_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Regression in R
+
+There is, of course, a mathematical way to estimate our regression model. I'll leave that to you to read up on. But, to do it in R we will use the `lm()` function (linear model). For the formula argument, the target is on the left and the features are on the right.
+
+
+```r
+(diam_lm &lt;- lm(formula = price ~ carat, data = diamonds))
+```
+
+```
+## 
+## Call:
+## lm(formula = price ~ carat, data = diamonds)
+## 
+## Coefficients:
+## (Intercept)        carat  
+##       -2256         7756
+```
+---
+### Interpreting the coefficients
+
+`$$\Huge \mbox{price} = -2256 + 7756 \times \mbox{carat}$$`
+
+For every one unit increase in carat, the price increases by $7756.
+
+If carat = 0, average price is -$2256
+
+---
+class: inverse, center, middle
+
+# End of Session 6.4
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

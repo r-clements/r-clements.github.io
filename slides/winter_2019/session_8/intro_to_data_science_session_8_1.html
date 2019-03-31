@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Data Science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Robert Clements" />
+    <link rel="stylesheet" href="rc_css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Data Science
+## Session 8.1
+### Robert Clements
+
+---
+
+
+
+### Housekeeping
+
+- Final exams (homework) will be cumulative, open note/book, and will be in two parts:
+
+  + Take home portion will be assigned next week in place of a homework assignment (Due by Friday April 5th at noon)
+  
+  + In class portion will be completed in class on the last day (Apr 2), and due in class by 9:30PM. 
+
+- Any questions?
+
+---
+### Session 8.1 Outline
+
+- R data structures
+- R functions and loops
+
+---
+class: inverse, center, middle
+# R Data Structures
+---
+### We've been using these structures a lot:
+
+- vectors:  all of the same type (character, numeric, etc.)
+
+
+
+```r
+x &lt;- c(1,2,3, 11, 12, 13)
+x
+```
+
+```
+## [1]  1  2  3 11 12 13
+```
+
+- data frames: two-dimensional; columns can be of different types 
+
+
+```r
+my_df &lt;- data.frame(x)
+my_df
+```
+
+```
+##    x
+## 1  1
+## 2  2
+## 3  3
+## 4 11
+## 5 12
+## 6 13
+```
+---
+### We've been using these structures a lot:
+
+- tibbles: similar to data frames
+
+
+```r
+my_tbl &lt;- as_tibble(x)
+my_tbl
+```
+
+```
+## # A tibble: 6 x 1
+##   value
+##   &lt;dbl&gt;
+## 1     1
+## 2     2
+## 3     3
+## 4    11
+## 5    12
+## 6    13
+```
+---
+### There are two other very common types: matrix and list
+
+- matrix: two-dimensional; all same type
+
+
+```r
+mdat &lt;- matrix(x, nrow = 2, ncol = 3, byrow = TRUE)
+mdat
+```
+
+```
+##      [,1] [,2] [,3]
+## [1,]    1    2    3
+## [2,]   11   12   13
+```
+
+---
+### There are two other very common types: matrix and list
+
+- matrix: two-dimensional; all same type
+
+
+```r
+mdat &lt;- matrix(x, nrow = 2, ncol = 3, byrow = FALSE)
+mdat
+```
+
+```
+##      [,1] [,2] [,3]
+## [1,]    1    3   12
+## [2,]    2   11   13
+```
+---
+### There are two other very common types: matrix and list
+
+A `list` is a generic vector containing other objects.
+
+
+```r
+my_list &lt;- list(a = c(1,2,3), 
+                b = c('a', 'b', 'c'), 
+                c = tibble(x = c(3,2,1), y = c('b', 'd', 'f')))
+my_list
+```
+
+```
+## $a
+## [1] 1 2 3
+## 
+## $b
+## [1] "a" "b" "c"
+## 
+## $c
+## # A tibble: 3 x 2
+##       x y    
+##   &lt;dbl&gt; &lt;chr&gt;
+## 1     3 b    
+## 2     2 d    
+## 3     1 f
+```
+---
+### R `list` structures
+
+They are similar to python `dictionaries` (key-value pairs). If you want to see the keys, you can use the `names()` function.
+
+
+```r
+names(my_list)
+```
+
+```
+## [1] "a" "b" "c"
+```
+---
+### R `list` structures
+
+Extract elements of a list:
+
+- by name: `$` or `[[]]`
+- by position: `[[]]`
+
+
+```r
+my_list[['a']]
+```
+
+```
+## [1] 1 2 3
+```
+
+```r
+my_list$a
+```
+
+```
+## [1] 1 2 3
+```
+
+```r
+my_list[[1]]
+```
+
+```
+## [1] 1 2 3
+```
+---
+### Many, many functions in R return `list`-type objects
+
+
+```r
+my_lm &lt;- lm(price ~ carat, data = diamonds)
+names(my_lm)
+```
+
+```
+##  [1] "coefficients"  "residuals"     "effects"       "rank"         
+##  [5] "fitted.values" "assign"        "qr"            "df.residual"  
+##  [9] "xlevels"       "call"          "terms"         "model"
+```
+
+---
+### Many, many functions in R return `list`-type objects
+
+
+```r
+my_lm[['coefficients']]
+```
+
+```
+## (Intercept)       carat 
+##   -2256.361    7756.426
+```
+
+```r
+my_lm$coefficients
+```
+
+```
+## (Intercept)       carat 
+##   -2256.361    7756.426
+```
+
+```r
+my_lm[[1]]
+```
+
+```
+## (Intercept)       carat 
+##   -2256.361    7756.426
+```
+---
+### Tibbles with `list` columns
+
+Remember this from last time?
+
+
+```r
+n &lt;- 1000 #how many samples
+slopes &lt;- rep(NA, n) # empty vector for saving coefficients
+for(i in 1:n) {
+  diam_samp &lt;- diamonds %&gt;% sample_n(10000) # random sample
+  diam_samp_lm &lt;- lm(price ~ carat, data = diam_samp)
+  slopes[i] &lt;- coef(diam_samp_lm)[2] # store the coefficient
+}
+slopes &lt;- as_tibble(slopes)
+slopes
+```
+
+```
+## # A tibble: 1,000 x 1
+##    value
+##    &lt;dbl&gt;
+##  1 7780.
+##  2 7807.
+##  3 7765.
+##  4 7814.
+##  5 7622.
+##  6 7852.
+##  7 7720.
+##  8 7786.
+##  9 7763.
+## 10 7791.
+## # ... with 990 more rows
+```
+---
+### Tibbles with `list` columns
+
+Let's do the same thing, but let's save our 1000 samples, models, and slopes all in one tibble. 
+
+
+```r
+n &lt;- 1000 #how many samples
+slopes &lt;- rep(NA, n) # empty vector for saving coefficients
+my_mods &lt;- my_samps &lt;- list() # empty lists for saving models and samples
+for(i in 1:n) {
+  diam_samp &lt;- diamonds %&gt;% sample_n(1000) # random sample
+  diam_samp_lm &lt;- lm(price ~ carat, data = diam_samp)
+  slopes[i] &lt;- coef(diam_samp_lm)[2] # store the coefficient
+  my_mods[[i]] &lt;- diam_samp_lm
+  my_samps[[i]] &lt;- diam_samp
+}
+all_results &lt;- tibble(my_samps, my_mods, slopes)
+```
+---
+### Tibbles with `list` columns
+
+Let's do the same thing, but let's save our 1000 samples, models, and slopes all in one tibble. 
+
+
+```r
+all_results
+```
+
+```
+## # A tibble: 1,000 x 3
+##    my_samps              my_mods  slopes
+##    &lt;list&gt;                &lt;list&gt;    &lt;dbl&gt;
+##  1 &lt;tibble [1,000 x 10]&gt; &lt;S3: lm&gt;  7658.
+##  2 &lt;tibble [1,000 x 10]&gt; &lt;S3: lm&gt;  8000.
+##  3 &lt;tibble [1,000 x 10]&gt; &lt;S3: lm&gt;  7663.
+##  4 &lt;tibble [1,000 x 10]&gt; &lt;S3: lm&gt;  7628.
+##  5 &lt;tibble [1,000 x 10]&gt; &lt;S3: lm&gt;  7770.
+##  6 &lt;tibble [1,000 x 10]&gt; &lt;S3: lm&gt;  7679.
+##  7 &lt;tibble [1,000 x 10]&gt; &lt;S3: lm&gt;  7791.
+##  8 &lt;tibble [1,000 x 10]&gt; &lt;S3: lm&gt;  7639.
+##  9 &lt;tibble [1,000 x 10]&gt; &lt;S3: lm&gt;  7834.
+## 10 &lt;tibble [1,000 x 10]&gt; &lt;S3: lm&gt;  7563.
+## # ... with 990 more rows
+```
+---
+class: inverse, center, middle
+# R Functions and Loops
+---
+### Defining R functions
+
+I want to run this code over and over again, but maybe I want to be able to modify the sample size, or the x variable in my regression model - this seems like the perfect time to talk about **functions**!!
+
+
+```r
+diam_samp &lt;- diamonds %&gt;% sample_n(1000) # random sample
+diam_samp_lm &lt;- lm(price ~ carat, data = diam_samp)
+slopes &lt;- coef(diam_samp_lm)[2] # store the coefficient
+```
+---
+### Defining R functions
+
+Each function could (but not must) have inputs and outputs:
+
+
+```r
+# name your function
+name_of_function &lt;- function(input arguments) { # define input arguments 
+  R code here
+  ...
+  return(what you want to return) # explicitly return something
+}
+
+# call the function
+name_of_function(input arguments)
+
+# or assign the output
+output_name &lt;- name_of_function(input arguments)
+```
+---
+### Defining R functions
+
+
+```r
+fit_model &lt;- function(samp_size) {
+  diam_samp &lt;- diamonds %&gt;% sample_n(samp_size) # random sample
+  diam_samp_lm &lt;- lm(price ~ carat, data = diam_samp)
+  slopes &lt;- coef(diam_samp_lm)[2] # store the coefficient
+  return(slopes)
+}
+
+# call function
+fit_model(100)
+```
+
+```
+##    carat 
+## 7190.149
+```
+---
+### Defining R functions
+
+Let's do the same for our regression model formula. We want to be able to pass to the function the name of the predictor variable: `price ~ ____`. 
+
+Easiest way to help us do this is to use the `paste0` function.
+
+
+```r
+predictor &lt;- 'carat'
+mod_formula &lt;- paste0('price ~ ', predictor)
+mod_formula
+```
+
+```
+## [1] "price ~ carat"
+```
+---
+### Pop Quiz
+
+Write a function that takes two arguments: (1) samp_size - sample size; (2) x_var - predictor variable. This function should take a sample from the diamonds data set of size `samp_size`, fit a regression model predicting `price` from `x_var`, and then return the slope coefficient from that model.
+
+
+---
+### Pop Quiz
+
+Modify your function so that it returns not just the slopes, but also the model and the sample of data, in a list.
+
+
+---
+### R `for` loops
+
+I want to call this function over and over again and save all of the results - this seems like the perfect time to talk about **loops**!
+
+We will only talk about `for` loops
+
+```r
+# create space for the output of your loop 
+output_vector &lt;- rep(NA, length of loop)
+
+# start the loop
+for(index in some sequence of values) {
+  R code here
+  ...
+  output_vector[index] &lt;- output # save the output for each iteration
+}
+```
+---
+### Pop Quiz
+
+Using a `for` loop, run the function we just created 3 times, use a sample of size 100 and `carat` as our predictor, save the results, and then put them in a tibble.
+
+
+```r
+n &lt;- 3
+slopes &lt;- rep(NA, n) # empty vector for saving coefficients
+my_mods &lt;- my_samps &lt;- list() # empty lists for saving models and samples
+for(i in 1:n) {
+  my_result &lt;- fit_model(100, 'carat')
+  
+  # extract the slope and store it in slopes
+  # store the model in my_mods
+  # store the sample in my_samps
+}
+all_results &lt;- tibble(my_samps, my_mods, slopes)
+```
+
+
+---
+class: inverse, center, middle
+
+# End of Session 8.1
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -1,0 +1,194 @@
+---
+title: "Introduction to Data Science"
+subtitle: "Session 4.4"
+author: "Robert Clements"
+date: ""
+output:
+  xaringan::moon_reader:
+    css: rc_css.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(fig.align = "center", fig.asp=.5, message = FALSE, warning = FALSE)
+```
+### Session 4.4 Outline
+
+- Reshaping data
+  + Gathering
+  + Spreading
+  + Separating
+  + Uniting
+  + *R for Data Science - Section 12*
+  + *Modern Data Science with R - Chapter 5.2*
+
+---
+class: inverse, center, middle
+# Reshaping data
+---
+### Gathering data
+
+Sometimes one variable is scattered across multiple rows. Remember this table of HIV prevalence?
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+hiv <- as.tibble(data.frame(Country = c('France', 'South Africa', 'United States'),
+                  Y1979 = c(NA, NA, .318), Y1980 = c(NA, NA, NA),
+                  Y1981 = c(.3, 14.8, 0.5), Y1982 = c(.4, 17.2, .6)))
+names(hiv) <- c('Country', 'Y1979', 'Y1989', 'Y1999', 'Y2009')
+```
+```{r, echo = FALSE}
+knitr::kable(hiv, 'html')
+```
+---
+### Gathering data
+
+Can we make it look like this instead?
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+hiv_2 <- hiv %>% gather('Y1979':'Y2009', key = 'Year', value = 'HIV_rate')
+```
+```{r, echo = FALSE}
+knitr::kable(hiv_2, 'html')
+```
+---
+### Gathering data
+
+Yes we can, with the `gather()` function from the `tidyr` package (part of the tidyverse).
+
+```{r, eval = FALSE}
+gather(..., key = , value = )
+```
+
+All we will need in order to do this is:
+
+1. A list of the columns that we need to gather together.
+2. A name for the variable that will form the gathered column names.
+3. A name for the variable whose values are spread out over the cells.
+
+![](pics/gather.png)
+---
+### Gathering data
+
+Yes we can, with the `gather()` function from the `tidyr` package (part of the tidyverse).
+
+```{r, eval = FALSE}
+gather(..., key = , value = )
+```
+
+All we will need in order to do this is:
+
+1. A list of the columns that we need to gather together. **... argument - column names**
+2. A name for the variable that will form the gathered column names. **`key` argument**
+3. A name for the variable whose values are spread out over the cells. **`value` argument**
+---
+### Gathering data
+
+Can we make it look like this instead?
+```{r}
+hiv_gathered <- hiv %>% gather(Y1979, Y1989, Y1999, Y2009, key = 'Year', value = 'HIV rate')
+```
+```{r, echo = FALSE}
+knitr::kable(hiv_gathered, 'html')
+```
+---
+### Gathering data
+
+Can we make it look like this instead?
+```{r}
+hiv_gathered <- hiv %>% gather(Y1979:Y2009, key = 'Year', value = 'HIV rate')
+```
+```{r, echo = FALSE}
+knitr::kable(hiv_gathered, 'html')
+```
+---
+### Pop Quiz
+
+Why might this result in an error?
+
+```{r, echo = FALSE}
+hiv_nums <- hiv
+names(hiv_nums) <- c('Country', '1979', '1989', '1999', '2009')
+knitr::kable(hiv_nums, 'html')
+```
+
+```{r, eval = FALSE}
+hiv %>% gather(1979:2009, key = 'Year', value = 'HIV rate')
+```
+---
+### Spreading data
+
+Sometimes you may have one observation's values scattered across multiple rows.
+
+```{r, echo = FALSE}
+hiv_3 <- hiv_2 %>% mutate(population = c(59, 45, 300, 62, 47, 310, 66, 50, 330, 70, 55, 350))
+hiv_scattered <- hiv_3 %>% gather(HIV_rate, population, key = 'variable', value = 'value') %>% arrange(Country, Year, variable)
+knitr::kable(head(hiv_scattered, 8), 'html')
+```
+---
+### Spreading data
+
+Can we make it look like this instead?
+
+```{r, echo=FALSE}
+hiv_scattered %>% spread(key = variable, value = value) %>% knitr::kable('html')
+```
+---
+### Spreading data
+
+Yes we can, with the `spread()` function from the `tidyr` package (part of the tidyverse).
+
+```{r, eval = FALSE}
+spread(key = , value = )
+```
+
+All we will need in order to do this is:
+
+1. The name of the variable that forms the gathered column names. **`key` argument**
+2. A name for the variable whose values are spread out over the cells. **`value` argument**
+
+![](pics/spread.png)
+---
+### Spreading data
+
+Fill in the blanks below to get the desired result:
+
+```{r, eval = FALSE}
+hiv_scattered %>% spread(key = ____, value = _____)
+```
+---
+### Separating data
+
+If we wish to split a column into multiple columns, we use the `separate()` function.
+
+```{r, echo=FALSE}
+pres_names <- data.frame(first_last = c('George Washington', 'Abraham Lincoln', 'John Kennedy'))
+```
+```{r}
+pres_names
+```
+
+```{r}
+pres_names %>% separate(first_last, into = c('first', 'last'), sep = ' ')
+```
+---
+### Uniting data
+
+The opposite of the `separate()` function is the `unite()` function which will paste columns together.
+
+```{r, echo = FALSE}
+pres_names <- pres_names %>% separate(first_last, into = c('first', 'last'), sep = ' ')
+```
+
+```{r}
+pres_names
+pres_names %>% unite(full_name, first, last, sep = '_/_')
+```
+---
+class: inverse, center, middle
+
+# End of Session 4.4

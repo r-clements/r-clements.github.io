@@ -1,0 +1,492 @@
+---
+title: "Introduction to Data Science"
+subtitle: "Session 7.1"
+author: "Robert Clements"
+date: ""
+output:
+  xaringan::moon_reader:
+    css: rc_css.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(fig.align = "center", fig.asp=.5, message = FALSE, warning = FALSE)
+```
+### Housekeeping
+
+- Midterms have been graded
+- Want to dig deeper with machine/statistical learning?
+  + UC Berkeley Extension offers four machine learning courses (**Python**, Spark, **R**, Tensorflow)
+  + Coursera - [Machine Learning](https://www.coursera.org/learn/machine-learning#)
+- Any other questions?
+
+---
+### Session 7.1 Outline
+
+- Midterm Review
+- Statistical learning
+  + More with Regression
+  + *Introduction to Statistical Learning - Chapter 3*
+---
+class: inverse, center, middle
+# Midterm review
+---
+class: inverse, center, middle
+# Statistical Learning I
+---
+### Regression
+
+How did we estimate this function?
+
+$$\large \mbox{price} = -2256 + 7756 \times \mbox{carat}$$
+
+We minimized the sum of the residuals (squared). Recall 
+
+residuals = observed value - predicted value
+
+The observed values of price are given in the data. The predicted values of price come from our function.
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+library(tidyverse)
+d_lm <- lm(price ~ carat, data = diamonds)
+diamonds_n <- diamonds %>% mutate(predicted = predict(d_lm))
+diamonds_n %>% ggplot(aes(x = carat, y = price)) +
+  geom_point(alpha = .1) +
+  geom_smooth(method='lm',formula=y~x) +
+  theme_bw()
+```
+---
+### Regression
+
+With simple linear regression, we assume a linear relationship between X and Y.
+
+**Parametric** 
+
+$$\huge f(X) = \beta_{0} + \beta_{1}X_{1} + \beta_{2}X_{2} + \ldots + \beta_{p}X_{p}$$
+
+We would love to know all of the $\Huge \beta$ values, but we won't, so we estimate them:
+
+$$\huge \hat{f}(X) = \hat{\beta}_{0} + \hat{\beta}_{1}X_{1} + \hat{\beta}_{2}X_{2} + \ldots + \hat{\beta}_{p}X_{p}$$
+---
+### Regression assumptions
+
+- Linearity - the mean of our target is a linear combination of our features
+
+- Constant variance (homoskedasticity) - the error around the regression line should be constant
+
+- Independence - errors are independent and uncorrelated
+
+- No multicollinearity - uncorrelated features
+---
+### Regression solution
+
+For those who are curious, the coefficients $\Huge \hat{\beta}$ are estimated like so:
+
+$$\huge \hat{\beta} = (X^{T}X)^{-1}X^{T}y$$
+
+where $\Huge X$ is a matrix of all of our features, and $\Huge y$ is our target
+---
+### Regression in R
+
+For a deep dive into regression (which can literally take years to learn), please check the readings. For now I want to focus only on these three topics:
+
+1. Coefficient interpretation and accuracy 
+
+2. Model accuracy
+
+3. Multiple regression (more than one feature)
+
+---
+### Regression in R
+
+There is, of course, a mathematical way to estimate our regression model. I'll leave that to you to read up on. But, to do it in R we will use the `lm()` function (linear model). For the formula argument, the target is on the left and the features are on the right.
+
+```{r}
+(diam_lm <- lm(formula = price ~ carat, data = diamonds))
+```
+---
+### Interpreting the coefficients
+
+$$\large \mbox{price} = -2256 + 7756 \times \mbox{carat}$$
+
+For every one unit increase in carat, the price increases, **on average**, by $7756.
+
+If carat = 0, average price is -$2256
+---
+### Significance of coefficients
+
+We ask ourselves two questions about our coefficients:
+
+1. Are they equal to zero? If so, that feature is not a good predictor of our target.
+
+2. What is the effect size, or the practical implications of the coefficient?
+---
+### Significance of coefficients
+
+Recall that we are *estimating* the coefficients, which means they have variability.
+
+What does our model look like if we were to take a random sample of the data and fit a new model?
+
+```{r, echo = FALSE}
+plot_diamonds <- diamonds %>% sample_n(5000)
+diamonds_samp <- diamonds %>% sample_n(100)
+d_lm <- lm(price ~ carat, data = diamonds_samp)
+plot_diamonds %>% ggplot(aes(x = carat, y = price)) +
+  geom_point(alpha = .1) +
+  geom_abline(intercept = coef(d_lm)[1], slope = coef(d_lm)[2], color = 'blue') +
+  theme_bw()
+```
+---
+### Significance of coefficients
+
+Recall that we are *estimating* the coefficients, which means they have variability.
+
+What does our model look like if we were to take a random sample of the data and fit a new model?
+
+```{r, echo = FALSE}
+diamonds_samp <- diamonds %>% sample_n(100)
+d_lm2 <- lm(price ~ carat, data = diamonds_samp)
+plot_diamonds %>% ggplot(aes(x = carat, y = price)) +
+  geom_point(alpha = .1) +
+  geom_abline(intercept = coef(d_lm)[1], slope = coef(d_lm)[2], color = 'blue') +
+  geom_abline(intercept = coef(d_lm2)[1], slope = coef(d_lm2)[2], color = 'blue') +
+  theme_bw()
+```
+---
+### Significance of coefficients
+
+Recall that we are *estimating* the coefficients, which means they have variability.
+
+What does our model look like if we were to take a random sample of the data and fit a new model?
+
+```{r, echo = FALSE}
+diamonds_samp <- diamonds %>% sample_n(100)
+d_lm3 <- lm(price ~ carat, data = diamonds_samp)
+plot_diamonds %>% ggplot(aes(x = carat, y = price)) +
+  geom_point(alpha = .1) +
+  geom_abline(intercept = coef(d_lm)[1], slope = coef(d_lm)[2], color = 'blue') +
+  geom_abline(intercept = coef(d_lm2)[1], slope = coef(d_lm2)[2], color = 'blue') +
+  geom_abline(intercept = coef(d_lm3)[1], slope = coef(d_lm3)[2], color = 'blue') +
+  theme_bw()
+```
+---
+### Significance of coefficients
+
+Recall that we are *estimating* the coefficients, which means they have variability.
+
+What does our model look like if we were to take a random sample of the data and fit a new model?
+
+```{r, echo = FALSE}
+diamonds_samp <- diamonds %>% sample_n(100)
+d_lm4 <- lm(price ~ carat, data = diamonds_samp)
+plot_diamonds %>% ggplot(aes(x = carat, y = price)) +
+  geom_point(alpha = .1) +
+  geom_abline(intercept = coef(d_lm)[1], slope = coef(d_lm)[2], color = 'blue') +
+  geom_abline(intercept = coef(d_lm2)[1], slope = coef(d_lm2)[2], color = 'blue') +
+  geom_abline(intercept = coef(d_lm3)[1], slope = coef(d_lm3)[2], color = 'blue') +
+  geom_abline(intercept = coef(d_lm4)[1], slope = coef(d_lm4)[2], color = 'blue') +
+  theme_bw()
+```
+---
+### Significance of coefficients
+
+Recall that we are *estimating* the coefficients, which means they have variability.
+
+What does our model look like if we were to take a random sample of the data and fit a new model?
+
+```{r, echo = FALSE}
+diamonds_samp <- diamonds %>% sample_n(100)
+d_lm5 <- lm(price ~ carat, data = diamonds_samp)
+plot_diamonds %>% ggplot(aes(x = carat, y = price)) +
+  geom_point(alpha = .1) +
+  geom_abline(intercept = coef(d_lm)[1], slope = coef(d_lm)[2], color = 'blue') +
+  geom_abline(intercept = coef(d_lm2)[1], slope = coef(d_lm2)[2], color = 'blue') +
+  geom_abline(intercept = coef(d_lm3)[1], slope = coef(d_lm3)[2], color = 'blue') +
+  geom_abline(intercept = coef(d_lm4)[1], slope = coef(d_lm4)[2], color = 'blue') +
+  geom_abline(intercept = coef(d_lm5)[1], slope = coef(d_lm5)[2], color = 'blue') +
+  theme_bw()
+```
+---
+### Significance of coefficients
+
+Let's do something similar to what we did last session with the standard error of the mean.
+
+```{r}
+n <- 1000 #how many samples
+slopes <- rep(NA, n) # empty vector for saving coefficients
+for(i in 1:n) {
+  diam_samp <- diamonds %>% sample_n(10000) # random sample
+  diam_samp_lm <- lm(price ~ carat, data = diam_samp)
+  slopes[i] <- coef(diam_samp_lm)[2] # store the coefficient
+}
+slopes <- as_tibble(slopes)
+```
+---
+### Significance of coefficients
+
+Let's do something similar to what we did last session with the standard error of the mean.
+
+Back to our first question about coefficients: is the coefficient equal to zero?
+
+```{r}
+slopes %>% ggplot(aes(x = slopes)) +
+  geom_histogram()
+```
+---
+### Significance of coefficients
+
+As you can see, the answer to our question depends on the standard error of our coefficients. 
+
+What if we had seen this histogram instead?
+
+```{r, echo = FALSE}
+as_tibble(rnorm(10000, mean = 7756, sd = 4000)) %>% ggplot(aes(x = value)) +
+  geom_histogram()
+```
+---
+### Significance of coefficients
+
+We typically rely on the p-value to tell us if our coefficient is significantly different than zero, using an estimate of the standard error.
+
+In words, the p-value in this case would be defined as: the probability of getting a coefficient as or more extreme than what we got, if the *true* coefficient was actually zero.
+
+Let's check the p-values from our regression model:
+
+```{r}
+library(broom)
+tidy(diam_lm)
+```
+---
+### Significance of coefficients
+
+The p-values for both the intercept and the slope (coefficient on `carat`) are zero, meaning we would say: 
+
+*the probability of getting a coefficient of 7756 or bigger, if there was actually no relationship between carat and price, is zero, so we conclude that carat is a significant predictor of price*.
+
+```{r}
+library(broom)
+tidy(diam_lm)
+```
+---
+### broom??? tidy???
+
+The `broom` package is a nice package for converting statistical analysis objects from R into tidy data frames. Otherwise, we have to deal with things like this:
+
+```{r}
+summary(diam_lm)
+```
+---
+### Effect size
+
+The second question we should ask is: what is the practical implication of our coefficient? Is it meaningful to say that for every 1 unit increase in carat, the price increases on average by $7756?
+
+This is a question that depends on the data, and your knowledge of it. 
+
+```{r}
+library(broom)
+tidy(diam_lm)
+```
+---
+### Question 
+
+Assume the coefficient on carat was 0.1, with a p-value of 0.05. Answer these questions:
+
+1. Interpret the coefficient.
+
+2. Is carat a signficant predictor?
+
+3. Explain the p-value in words?
+
+4. Is there a large effect size?
+---
+### Model accuracy
+
+```{r, echo=FALSE}
+plot_diamonds <- diamonds %>% sample_n(200)
+d_lm <- lm(price ~ carat, data = plot_diamonds)
+```
+
+From here we want to know how well does the model fit the data. We will use $\large R^2$ for this.
+
+$\large R^2$ is the proportion of variability in $\large Y$ that is explained by our model:
+
+$$R^2 = 1 - \frac{SS_{Error}}{SS_{Total}}$$
+
+where $SS_{Error}$ = the sum of the squared residuals, and
+
+$SS_{Total}$ = the total sum of squares = $\sum_{i = 1}^{n}(y_{i}-\bar{y})^2$
+
+---
+### Model accuracy
+
+For example:
+
+- here's the total variability in $\large Y$
+
+```{r, echo = FALSE}
+plot_diamonds %>% ggplot(aes(x = carat, y = price)) + 
+  geom_point(alpha = .2) +
+  geom_hline(aes(yintercept = mean(price))) + 
+  geom_segment(aes(x=carat, xend=carat, y=price, yend=mean(price)), alpha = .2) +
+  theme_bw()
+```
+---
+### Model accuracy
+
+- now fit the model
+
+```{r, echo = FALSE}
+plot_diamonds %>% ggplot(aes(x = carat, y = price)) + 
+  geom_point(alpha = .2) +
+  geom_hline(aes(yintercept = mean(price))) +
+  geom_smooth(method='lm',formula=y~x, se = FALSE) +
+  geom_segment(aes(x=carat, xend=carat, y=price, yend=mean(price)), alpha = .2) +
+  theme_bw()
+```
+---
+### Model accuracy
+
+- here's the model's variability. The spread of points around the model looks smaller than the spread of points around the mean. We would say that `carat` helped **explain** some of the variance in `price`.
+
+```{r, echo = FALSE}
+plot_diamonds <- plot_diamonds %>% mutate(predicted = predict(d_lm))
+plot_diamonds %>% ggplot(aes(x = carat, y = price)) + 
+  geom_point(alpha = .2) +
+  geom_hline(aes(yintercept = mean(price))) +
+  geom_smooth(method='lm',formula=y~x, se = FALSE) +
+  # geom_segment(aes(x=carat, xend=carat, y=price, yend=mean(price)), alpha = .2) +
+  geom_segment(aes(x=carat, xend=carat, y=price, yend=predicted), alpha = .2, color = 'red') +
+  theme_bw()
+```
+---
+### Model accuracy
+
+- $\large R^2$ is the proportion of this...
+
+```{r, echo = FALSE}
+plot_diamonds %>% ggplot(aes(x = carat, y = price)) + 
+  geom_point(alpha = .2) +
+  geom_hline(aes(yintercept = mean(price))) +
+  # geom_smooth(method='lm',formula=y~x, se = FALSE) +
+  geom_segment(aes(x=carat, xend=carat, y=price, yend=mean(price)), alpha = .2) +
+  theme_bw()
+```
+---
+### Model accuracy
+
+- $\large R^2$ is the proportion of this...explained by this
+
+```{r, echo = FALSE}
+plot_diamonds %>% ggplot(aes(x = carat, y = price)) + 
+  geom_point(alpha = .2) +
+  # geom_hline(aes(yintercept = mean(price))) +
+  geom_smooth(method='lm',formula=y~x, se = FALSE) +
+  geom_segment(aes(x=carat, xend=carat, y=price, yend=predicted), alpha = .2, color = 'red') +
+  theme_bw()
+```
+---
+### Model accuracy
+
+$\large R^2$ is the proportion of variability in $\large Y$ that is explained by our model:
+
+```{r}
+library(broom)
+glance(diam_lm)
+```
+---
+### Model accuracy
+
+Important points: 
+
+- $\large R^2$ is always between 0 and 1
+
+- the bigger $\large R^2$ is, the *better* your model fits the data
+
+- a small $\large R^2$ doesn't always mean the model is a poor fit (social sciences often have small $\large R^2$)
+
+- $\large R^2$ always increases as you add more features to your model (the `adjusted` $\large R^2$ should be used instead - it penalizes the $\large R^2$ for each additional feature)
+
+$$\text{adjusted-}R^2 = 1 - \frac{SS_{Error}}{SS_{Total}}\times \frac{n-1}{n-k-1}$$
+
+where $n$ = number of observations and $k$ = number of features
+---
+### Multiple regression
+
+Multiple regression is when we fit a model with *more than one* feature. Let's add `x`, `y`, and `z` from the dataset to the model. 
+
+```{r}
+diam_mult_lm <- lm(price ~ carat + x + y + z, data = diamonds)
+tidy(diam_mult_lm)
+```
+---
+### Multiple regression
+
+Recall what we said about the $\large R^2$ when we add more features?
+
+```{r}
+glance(diam_lm)
+glance(diam_mult_lm)
+```
+---
+### Interpreting coefficients
+
+Now that we have more than one feature in the model, we add a little verbiage to our interpretation to account for the *other* features.
+
+Ex: for every one unit increase in **carat**, the price increases, **on average**, by $10,234, **controlling for all other features**, i.e. assuming all other features are held constant.
+
+```{r}
+tidy(diam_mult_lm)
+```
+---
+### Pop Quiz
+
+The model with `carat`, `x`, `y`, and `z` had a slightly higher adjusted $\large R^2$ value and all significant features, but why might it not be a good idea to add `x`, `y`, and `z` to our model? 
+
+Hint: take a look at the `cor()` function.
+
+---
+### Multiple regression
+
+We can also add categorical variables to our model? Let's add `cut`:
+
+```{r}
+diamonds <- diamonds %>% mutate(cut_fct = factor(cut, ordered = FALSE))
+diam_mult_lm <- lm(price ~ carat + cut_fct, data = diamonds)
+tidy(diam_mult_lm)
+```
+---
+### Multiple regression
+
+How do we interpet the coefficients on `cut`?
+
+We would say that the mean price difference between Good and Fair diamonds is $1120. Similary, the mean price difference between Ideal and Fair diamonds is $1800.
+
+```{r, echo = FALSE}
+tidy(diam_mult_lm)
+```
+---
+### Review
+
+What did we learn?
+
+- How we can interpret coefficients on numeric and categorical features
+
+- How we can determine the significance of a coefficient
+  + effect size
+  + p-values
+  
+- How we measure the model's goodness-of-fit with the `adjusted` $\large R^2$
+
+- Basic multiple regression
+
+---
+class: inverse, center, middle
+
+# End of Session 7.1

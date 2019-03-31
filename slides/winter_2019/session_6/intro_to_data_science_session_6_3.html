@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Data Science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Robert Clements" />
+    <link rel="stylesheet" href="rc_css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Data Science
+## Session 6.3
+### Robert Clements
+
+---
+
+
+
+
+
+
+### Session 6.3 Outline
+
+- Fundamental statistics concepts
+  + Simpson's paradox
+- Recoding variables
+  + Factors
+  + Dates and times
+  + *R for Data Science Ch 15 &amp; 16*
+
+---
+class: inverse, center, middle
+# Simpson's paradox
+---
+### Simpson's paradox
+
+... is when groups of data show one particular trend, but this trend is reversed when the groups are combined together.
+
+Famous example: Berkeley admissions
+
+From a study done in the 70's, we have:
+
+1. admissions data by department (A-F)
+
+2. gender of applicant
+
+3. admissions decision
+---
+### Simpson's paradox
+
+... is when groups of data show one particular trend, but this trend is reversed when the groups are combined together.
+
+
+Famous example: Berkeley admissions
+
+
+```r
+ucb_ad &lt;- read_csv(file = 'ucb_admiss.csv')
+ucb_ad 
+```
+
+```
+## # A tibble: 24 x 4
+##    Admit    Gender Dept   Freq
+##    &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt;
+##  1 Admitted Male   A       512
+##  2 Rejected Male   A       313
+##  3 Admitted Female A        89
+##  4 Rejected Female A        19
+##  5 Admitted Male   B       353
+##  6 Rejected Male   B       207
+##  7 Admitted Female B        17
+##  8 Rejected Female B         8
+##  9 Admitted Male   C       120
+## 10 Rejected Male   C       205
+## # ... with 14 more rows
+```
+ 
+---
+### Simpson's paradox
+
+Here we plot the distribution of admission decisions overall **by gender**:
+
+
+```r
+ucb_ad %&gt;% 
+  ggplot() + geom_bar(aes(x = Gender, y = Freq, fill = Admit), stat = 'identity', position = 'fill') +
+ labs(x = 'Gender', y = '', fill = 'Admission',
+       title = 'Admit by gender') +
+  theme_bw()
+```
+
+&lt;img src="intro_to_data_science_session_6_3_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Simpson's paradox
+
+Here we plot the distribution of admission decisions **by gender and department**:
+
+
+```r
+ucb_ad %&gt;% 
+  ggplot() + geom_bar(aes(x = Gender, y = Freq, fill = Admit), stat = 'identity', position = 'fill') +
+  facet_grid(~ Dept) +
+  labs(x = 'Gender', y = '', fill = 'Admission',
+       title = 'Admit by gender by department') +
+  theme_bw()
+```
+
+&lt;img src="intro_to_data_science_session_6_3_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+---
+### What happened?
+
+Females tend to apply for more competitive departments.
+
+Here we plot the distribution of applicants **by gender and department**:
+
+
+```r
+ucb_ad %&gt;% 
+  ggplot() + geom_bar(aes(x = Gender, y = Freq), stat = 'identity') +
+  facet_grid(~ Dept) +
+  labs(x = 'Gender', y = '', fill = 'Admission',
+       title = 'Applicants by gender by department') +
+  theme_bw()
+```
+
+&lt;img src="intro_to_data_science_session_6_3_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Recall this counterintuitive relationship
+
+What can we do to try to reveal a more intuitive relationship using a third variable? We'll save that for later...
+
+
+```r
+diamonds %&gt;% ggplot(aes(x = cut, y = price)) +
+  geom_boxplot()
+```
+
+&lt;img src="intro_to_data_science_session_6_3_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+class: inverse, center, middle
+# Recoding variables
+---
+### Recoding variables
+
+Motivation:
+
+- We know how to import/export our data (`read_***()` and `write_***()`)
+
+- We know how to tidy our data (`spread()` and `gather()`)
+
+- We know how to do aggregations (`summarize()`)
+
+- We know how to subset and create new variables (`select()`, `filter()`, and `mutate()`)
+
+- We know how to rearrange the data (`arrange()`)
+
+---
+### Recoding variables
+
+But what do we do if we want to either: 
+
+- convert from `numeric` to unordered `categorical` (`factor`),
+
+- convert from `character` to unordered `factor`,
+
+- convert from unordered `factor` to `ordinal`,
+
+- rearrange the levels of a `factor`,
+
+- recode a `categorical` variable with different categories,
+
+- or convert a `character` to a `date`.
+---
+### More about `factors`
+
+But first, what are `factors`?
+
+A `factor` is a categorical or ordinal variable with a defined set of categories, or `levels`. By default, R will order the levels of a factor in alphabetical order.
+
+
+```r
+breed &lt;- c('collie', 'collie', 'spaniel', 
+           'poodle', 'poodle')
+breed_fct &lt;- factor(breed)
+breed_fct
+```
+
+```
+## [1] collie  collie  spaniel poodle  poodle 
+## Levels: collie poodle spaniel
+```
+
+```r
+levels(breed_fct)
+```
+
+```
+## [1] "collie"  "poodle"  "spaniel"
+```
+---
+### More about `factors`
+
+R treats `factors` differently than just `character` variables by making use of `levels`. Your factor can have levels that don't always appear in your variable.
+
+
+```r
+breed_fct &lt;- factor(breed, levels = c('collie', 'poodle', 
+                                      'spaniel', 'terrier', 
+                                      'mutt'))
+
+breed_fct
+```
+
+```
+## [1] collie  collie  spaniel poodle  poodle 
+## Levels: collie poodle spaniel terrier mutt
+```
+
+```r
+levels(breed_fct)
+```
+
+```
+## [1] "collie"  "poodle"  "spaniel" "terrier" "mutt"
+```
+---
+### More about `factors`
+
+And your variable may have values that haven't been defined as a level.
+
+
+```r
+breed_new &lt;- c('doberman', 'collie', 'collie', 'spaniel', 
+               'poodle', 'poodle')
+breed_new_fct &lt;- factor(breed_new, levels = c('collie', 'poodle', 
+                                              'spaniel', 'terrier', 
+                                              'mutt'))
+
+breed_new_fct
+```
+
+```
+## [1] &lt;NA&gt;    collie  collie  spaniel poodle  poodle 
+## Levels: collie poodle spaniel terrier mutt
+```
+
+```r
+levels(breed_new_fct)
+```
+
+```
+## [1] "collie"  "poodle"  "spaniel" "terrier" "mutt"
+```
+---
+### Convert from `numeric` to `categorical`
+
+Use `case_when()` from the `dplyr` package!!
+
+`case_when()` takes a series of two-sided formulas, where:
+
+- left hand side is a logical expression
+
+- right hand side gives the value
+
+Example:
+
+
+```r
+x &lt;- 1:10
+x
+```
+
+```
+##  [1]  1  2  3  4  5  6  7  8  9 10
+```
+
+```r
+x_cat &lt;- case_when(x &lt; 3 ~ '&lt;3',
+                   x &gt;= 3 &amp; x &lt; 6 ~ '3&lt;=x&lt;6',
+                   x &gt;= 6 ~ '&gt;6')
+```
+---
+### Convert from `numeric` to `categorical`
+
+Use `case_when()` from the `dplyr` package!!
+
+`case_when()` takes a series of two-sided formulas, where:
+
+- left hand side is a logical expression
+
+- right hand side gives the value
+
+Example:
+
+
+```r
+x_cat
+```
+
+```
+##  [1] "&lt;3"     "&lt;3"     "3&lt;=x&lt;6" "3&lt;=x&lt;6" "3&lt;=x&lt;6" "&gt;6"     "&gt;6"    
+##  [8] "&gt;6"     "&gt;6"     "&gt;6"
+```
+
+```r
+class(x_cat)
+```
+
+```
+## [1] "character"
+```
+---
+### Convert from `character` to unordered `factor`
+
+`character` variables are **not** factors yet.
+
+
+```r
+class(x_cat)
+```
+
+```
+## [1] "character"
+```
+
+```r
+x_fct &lt;- factor(x_cat)
+class(x_fct)
+```
+
+```
+## [1] "factor"
+```
+
+```r
+x_fct
+```
+
+```
+##  [1] &lt;3     &lt;3     3&lt;=x&lt;6 3&lt;=x&lt;6 3&lt;=x&lt;6 &gt;6     &gt;6     &gt;6     &gt;6     &gt;6    
+## Levels: &lt;3 &gt;6 3&lt;=x&lt;6
+```
+---
+### Convert from unordered `factor` to ordered `factor`
+
+If you want ordinal variables, you have to be explicit
+
+
+```r
+class(x_fct)
+```
+
+```
+## [1] "factor"
+```
+
+```r
+x_fct &lt;- factor(x_fct, ordered = TRUE)
+class(x_fct)
+```
+
+```
+## [1] "ordered" "factor"
+```
+
+```r
+x_fct
+```
+
+```
+##  [1] &lt;3     &lt;3     3&lt;=x&lt;6 3&lt;=x&lt;6 3&lt;=x&lt;6 &gt;6     &gt;6     &gt;6     &gt;6     &gt;6    
+## Levels: &lt;3 &lt; &gt;6 &lt; 3&lt;=x&lt;6
+```
+---
+### Rearrange the levels of a `factor`
+
+Use the `fct_relevel()` function from the `forcats` package (from the `tidyverse`)!!
+
+`forcats` provides a whole bunch of convenience functions for dealing with `factors`.
+
+
+```r
+x_fct &lt;- factor(x_fct, ordered = TRUE)
+x_fct
+```
+
+```
+##  [1] &lt;3     &lt;3     3&lt;=x&lt;6 3&lt;=x&lt;6 3&lt;=x&lt;6 &gt;6     &gt;6     &gt;6     &gt;6     &gt;6    
+## Levels: &lt;3 &lt; &gt;6 &lt; 3&lt;=x&lt;6
+```
+
+```r
+levels(x_fct)
+```
+
+```
+## [1] "&lt;3"     "&gt;6"     "3&lt;=x&lt;6"
+```
+---
+### Rearrange the levels of a `factor`
+
+Use the `fct_relevel()` function from the `forcats` package (from the `tidyverse`)!!
+
+
+```r
+x_fct
+```
+
+```
+##  [1] &lt;3     &lt;3     3&lt;=x&lt;6 3&lt;=x&lt;6 3&lt;=x&lt;6 &gt;6     &gt;6     &gt;6     &gt;6     &gt;6    
+## Levels: &lt;3 &lt; &gt;6 &lt; 3&lt;=x&lt;6
+```
+
+```r
+x_fct &lt;- fct_relevel(x_fct, '&lt;3', '3&lt;=x&lt;6', '&gt;6')
+
+levels(x_fct)
+```
+
+```
+## [1] "&lt;3"     "3&lt;=x&lt;6" "&gt;6"
+```
+---
+### Pop Quiz?
+
+Dealing with factors this way comes in handy during EDA and when building models with categorical variables. Why?
+
+
+---
+### Recode a `categorical` variable with different categories
+
+Use `fct_recode()`
+
+
+```r
+x_fct_re &lt;- fct_recode(x_fct,  'less than 3' = '&lt;3',
+                       'between 3 and 6' = '3&lt;=x&lt;6',
+                       'other' = '&gt;6')
+x_fct_re
+```
+
+```
+##  [1] less than 3     less than 3     between 3 and 6 between 3 and 6
+##  [5] between 3 and 6 other           other           other          
+##  [9] other           other          
+## Levels: less than 3 &lt; between 3 and 6 &lt; other
+```
+---
+### Recode a `categorical` variable with different categories
+
+We can also collapse categories with `fct_collapse()`
+
+
+```r
+x_fct_coll &lt;- fct_collapse(x_fct, 'less than 3' = '&lt;3',
+                           'other' = c('3&lt;=x&lt;6', '&gt;6'))
+x_fct_coll
+```
+
+```
+##  [1] less than 3 less than 3 other       other       other      
+##  [6] other       other       other       other       other      
+## Levels: less than 3 &lt; other
+```
+
+---
+### Convert a `character` to a `date`
+
+Dealing with dates can be a pain. Luckily, we can use the `lubridate` package.
+
+
+Useful functions:
+
+- `ymd()`, `ymd_hms()`, `dmy()`, `dmy_hms()`, `mdy()`: for parsing date-times
+
+- `year()`, `month()`, `mday()`, `hour()`, `minute()`, `second()`: for extracting or setting components
+
+- `with_tz()`, `force_tz()`: for dealing with time zones
+
+---
+### Convert a `character` to a `date`
+
+Define a new character variable consisting of a date in a usual date format (ex. mm/dd/yyyy, yyyy-mm-dd, etc.)
+
+
+
+```r
+birthday &lt;- c('6/16/1915') # John Tukey's birthday
+birthday
+```
+
+```
+## [1] "6/16/1915"
+```
+
+```r
+class(birthday)
+```
+
+```
+## [1] "character"
+```
+---
+### Convert a `character` to a `date`
+
+Parsing dates
+
+
+```r
+library(lubridate)
+birthday
+```
+
+```
+## [1] "6/16/1915"
+```
+
+```r
+birthday &lt;- mdy(birthday)
+birthday
+```
+
+```
+## [1] "1915-06-16"
+```
+
+```r
+class(birthday)
+```
+
+```
+## [1] "Date"
+```
+---
+### Convert a `character` to a `date`
+
+Parsing dates
+
+
+```r
+birthday &lt;- '1915-06-16 12:22:21.01'
+birthday &lt;- ymd_hms(birthday)
+birthday
+```
+
+```
+## [1] "1915-06-16 12:22:22 UTC"
+```
+
+```r
+class(birthday)
+```
+
+```
+## [1] "POSIXct" "POSIXt"
+```
+---
+### Convert a `character` to a `date`
+
+Extracting and setting components
+
+
+```r
+birthday
+```
+
+```
+## [1] "1915-06-16 12:22:22 UTC"
+```
+
+```r
+year(birthday)
+```
+
+```
+## [1] 1915
+```
+
+```r
+hour(birthday) &lt;- 5
+birthday
+```
+
+```
+## [1] "1915-06-16 05:22:24 UTC"
+```
+---
+### Convert a `character` to a `date`
+
+Printing or changing time zones
+
+Note: you can check `olson_time_zones()` for a list of time zones
+
+
+```r
+# Changes the time to the new time zone
+with_tz(birthday, tzone = "America/Chicago")
+```
+
+```
+## [1] "1915-06-15 23:22:24 CST"
+```
+
+```r
+# Keeps the time, but changes the time zone
+force_tz(birthday, tzone = "America/Chicago")
+```
+
+```
+## [1] "1915-06-16 05:22:24 CST"
+```
+---
+### Pop Quiz
+
+1. Enter your birthday into R, convert it to a Date object, and find the day of the week you were born using `weekdays()`.
+
+2. How many days old are you? (Hint: use `Sys.Date()` to get today's date)
+---
+### If we have time, let's work on this problem...
+
+What can we do to try to reveal a more intuitive relationship using a third variable? 
+
+
+```r
+diamonds %&gt;% ggplot(aes(x = cut, y = price)) +
+  geom_boxplot()
+```
+
+&lt;img src="intro_to_data_science_session_6_3_files/figure-html/unnamed-chunk-24-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+class: inverse, center, middle
+
+# End of Session 6.3
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

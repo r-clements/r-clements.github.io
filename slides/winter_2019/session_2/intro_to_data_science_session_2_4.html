@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Data Science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Robert Clements" />
+    <link rel="stylesheet" href="rc_css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Data Science
+## Session 2.4
+### Robert Clements
+
+---
+
+
+
+
+### Session 2.4 Outline
+
+- R Notebooks
+
+- R packages
+
+---
+class: center, inverse, middle
+# R Notebooks
+---
+### R Notebooks
+
+Before R Notebooks...
+
+--
+
+there was R Markdown.
+
+--
+
+And before R Markdown...
+
+--
+
+there was LaTex for Academics and Microsoft Office for everybody else.
+
+---
+### R Notebooks
+
+- Literate programming
+
+- Similar to [Jupyter notebooks](http://jupyter.org/)
+  + R Notebooks are plain text, so can use git
+  
+- Interactive computing
+  + Results display directly in your source code
+
+- Notebook viewer in the Viewer pane
+
+- Share easily with others (just share the nb.html file)
+  + Contains html and Rmd
+
+- Can even be compiled into html, pdf and doc
+
+---
+### R Notebooks versus R Markdown
+
+- These are now essentially the same thing
+
+- Before Notebooks, R Markdown did not display output in the source document
+  + Output would display in the console or Plots pane
+  
+- R Markdown cannot be previewed in the Viewer
+  + These still must be knitted
+  
+- Feel free to use whichever you feel most comfortable with
+
+---
+class: inverse, center, middle
+
+# R Notebook Demo
+
+---
+class: inverse, center, middle
+# R Packages
+---
+### R Packages
+
+By now, you've noticed that we make use of external R packages to do most of our work.
+
+.center[![](pics/r_packages.png)]
+---
+# How to use R packages
+Typically we will load packages into R using `library()`. This should go at the top of your R scripts. In R Markdown, you should have all of your packages loaded in their own R chunk (the first R chunk you create) like this:
+
+````markdown
+```{r, warning = FALSE, message = FALSE}
+library(tidyverse)
+library(mdsr)
+```
+````
+
+---
+# Function masking
+
+Some function names might be common across multiple R packages, or may already even exist in base R, even though they do different things. This is ok. Whichever package is loaded last will have priority.
+
+Or, you can use the namespace (package name) to specify which package you are referring to. Instead of typing
+
+`filter()`
+
+which exists in multiple packages (dplyr and stats), you can use
+
+`dplyr::filter()`
+---
+class: inverse, center, middle
+
+# End of Session 2.4
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

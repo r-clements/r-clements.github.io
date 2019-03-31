@@ -1,0 +1,404 @@
+---
+title: "Introduction to Data Science"
+subtitle: "Session 3.1"
+author: "Robert Clements"
+date: ""
+output:
+  xaringan::moon_reader:
+    css: rc_css.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(fig.align = "center", fig.asp=.5, message = FALSE, warning = FALSE)
+```
+
+### Housekeeping
+
+- Missing/late Homework 1 assignments.
+- Git and Github: how much you use this is up to you, but you'll be "tested" on doing the absolute basics.
+- R Notebooks: silly bug.
+- Any other questions?
+
+---
+### Session 3.1 Outline
+
+- Homework 2 Questions and Solutions
+- Examples of Bad Visualizations
+- More Grammar of Graphics
+  + *R for Data Science - Sections 3.8 and 3.9*
+- Canonical Data Graphics
+  + *Modern Data Science with R - Chapter 3.2*
+
+---
+class: inverse, center, middle
+# Homework 2 Questions?
+---
+class: inverse, center, middle
+
+# Examples of Bad Visualizations
+
+---
+### Bad Graphics
+
+You'll find no shortage of bad and/or misleading graphics in the media (news **and** social). Some of these are innocent oversights, and some are purposely deceptive and are typically political in nature. The deceptive ones like to fuss around with axis scales. We'll discuss this topic more in a couple of weeks when we talk about Ethics in data science.
+
+### Remember this graphic from the homework?
+
+[What is a Data Scientist](https://static.guim.co.uk/sys-images/Guardian/Pix/pictures/2012/3/2/1330695817953/EMC2-graphic-on-data-scie-008.jpg)
+
+### Some WTF graphics here:
+
+[http://viz.wtf/](http://viz.wtf/)
+
+---
+class: inverse, center, middle
+
+# More Grammar of Graphics
+
+---
+### Position adjustments
+
+Useful for bar charts and scatterplots.
+
+```{r}
+library(ggplot2)
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut))
+```
+
+---
+### Position adjustments
+
+Useful for bar charts and scatterplots. `color` doesn't do what you'd think.
+
+```{r}
+library(ggplot2)
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, color = cut))
+```
+
+---
+### Position adjustments
+
+Useful for bar charts and scatterplots. `color` doesn't do what you'd think. Use `fill` instead.
+
+```{r}
+library(ggplot2)
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = cut))
+```
+---
+### Position adjustments
+
+Useful for bar charts and scatterplots. `color` doesn't do what you'd think. Use `fill` instead.
+
+```{r}
+library(ggplot2)
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity))
+```
+---
+### Position adjustments
+
+Useful for bar charts and scatterplots. `color` doesn't do what you'd think. Use `fill` instead. Change the `position` of the bars. `identity` doesn't make much sense here.
+
+```{r}
+library(ggplot2)
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = "identity")
+```
+---
+### Position adjustments
+
+Useful for bar charts and scatterplots. `color` doesn't do what you'd think. Use `fill` instead. Change the `position` of the bars. `dodge` works well.
+
+```{r}
+library(ggplot2)
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = "dodge")
+```
+---
+### Position adjustments
+
+Useful for bar charts and scatterplots. `color` doesn't do what you'd think. Use `fill` instead. Change the `position` of the bars. `fill` is like stacking but all bars are same height.
+
+```{r}
+library(ggplot2)
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = "fill")
+```
+---
+### Position adjustments
+
+Useful for bar charts and scatterplots. There are overlapping points.
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy))
+```
+---
+### Position adjustments
+
+Useful for bar charts and scatterplots. There are overlapping points. Let's add some slight noise.
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy), position = "jitter")
+```
+---
+### Coordinate systems
+
+Cartesian coordinates can be flipped.
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + 
+  geom_boxplot()
+```
+---
+### Coordinate systems
+
+Cartesian coordinates can be flipped.
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + 
+  geom_boxplot() +
+  coord_flip()
+```
+---
+### Coordinate systems
+
+Geographic coordinates.
+
+```{r}
+nz <- map_data("nz")
+
+ggplot(nz, aes(long, lat, group = group)) +
+  geom_polygon(fill = "white", colour = "black")
+```
+---
+### Coordinate systems
+
+Geographic coordinates.
+
+```{r}
+ggplot(nz, aes(long, lat, group = group)) +
+  geom_polygon(fill = "white", colour = "black") +
+  coord_quickmap()
+```
+---
+### Pop Quiz
+
+Make this plot using the `mpg` data set.
+
+```{r, echo=FALSE}
+ggplot(data = mpg, mapping = aes(x = drv, fill = class)) + 
+  geom_bar(position = 'dodge') + 
+  xlab('Drive of vehicle') +
+  coord_flip()
+```
+---
+class: inverse, center, middle
+
+# Canonical Data Graphics
+
+---
+### Univariate
+
+Distributions of single variables can be visualized using:
+
+- **bar chart (categorical variables)**
+- histogram
+- density plot
+
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut))
+```
+---
+### Univariate
+
+Distributions of single variables can be visualized using:
+
+- bar chart
+- **histogram (continuous variables)**
+- density plot
+
+```{r}
+head(diamonds)
+```
+---
+### Univariate
+
+Distributions of single variables can be visualized using:
+
+- bar chart
+- **histogram (continuous variables)**
+- density plot
+
+Let's visualize `carat`.
+
+Histograms work by placing your variable's values into bins. The range of your x-variable (0.20 to 5.01) is divided up into bins of equal width, and then we count how many observations fall into each bin and plot a bar whose x-axis is the left and right boundaries of the bin, and y-axis (height) equals:
+
+- number of observations in the bin, or
+- proportion of observations in the bin
+---
+### Univariate
+
+Distributions of single variables can be visualized using:
+
+- bar chart
+- **histogram (continuous variables)**
+- density plot
+
+```{r}
+ggplot(data = diamonds) + 
+  geom_histogram(mapping = aes(x = carat))
+```
+---
+### Univariate
+
+Distributions of single variables can be visualized using:
+
+- bar chart
+- **histogram (continuous variables)**
+- density plot
+
+```{r}
+ggplot(data = diamonds) + 
+  geom_histogram(mapping = aes(x = carat), binwidth = 1)
+```
+---
+### Univariate
+
+Distributions of single variables can be visualized using:
+
+- bar chart
+- **histogram (continuous variables)**
+- density plot
+
+```{r}
+ggplot(data = diamonds) + 
+  geom_histogram(mapping = aes(x = carat), binwidth = .01)
+```
+---
+### Univariate
+
+Distributions of single variables can be visualized using:
+
+- bar chart
+- histogram
+- **density plot (continuous variables)**
+
+Let's visualize `carat`.
+
+Density curves are like a smoothed curve that traces over the histogram bar heights, and rescales the y-axes.
+---
+### Univariate
+
+Distributions of single variables can be visualized using:
+
+- bar chart
+- histogram
+- **density plot (continuous variables)**
+
+```{r}
+ggplot(data = diamonds) + 
+  geom_density(mapping = aes(x = carat)) 
+```
+---
+### Univariate
+
+Distributions of single variables can be visualized using:
+
+- bar chart
+- histogram
+- **density plot (continuous variables)**
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = carat)) + 
+  geom_histogram(fill = "white", color = "green", mapping = aes(y = ..density..)) +
+  geom_density() 
+```
+---
+### Univariate
+
+Distributions of single variables can be visualized using:
+
+- bar chart
+- histogram
+- **density plot (continuous variables)**
+
+```{r}
+ggplot(data = diamonds) + 
+  geom_density(mapping = aes(x = carat), adjust = 2) 
+```
+---
+### Multivariate
+
+Relationships between more than one variable can be visualized using:
+
+```{r, echo = FALSE}
+df <- data.frame(response = c('numeric', 'numeric', 'categorical'), explanatory = c('numeric', 'categorical', 'categorical'), type = c('scatter', 'box', 'mosaic'), geom = c('geom_point()', 'geom_boxplot()', 'does not exist in ggplot2'))
+names(df)[c(1,2)] <- c('response (y)', 'explanatory (x)')
+knitr::kable(df, format = 'html')
+```
+---
+### Multivariate
+
+Relationships between more than one variable can be visualized using:
+
+- **boxplot (continuous vs categorical)**
+
+A boxplot (or box-and-whisker) shows the lower whisker (min value > outliers), Q1 (first quartile or 25th percentile), median, Q3 (third quartile or 75th percentile), and upper whisker (max value < outliers). 
+
+
+---
+### Multivariate
+
+Relationships between more than one variable can be visualized using:
+
+- **boxplot (continuous vs categorical)**
+
+```{r}
+ggplot(data = diamonds) +
+  geom_boxplot(mapping = aes(x = cut, y = carat))
+```
+---
+### Multivariate
+
+Relationships between more than one variable can be visualized using:
+
+- **boxplot (continuous vs categorical)**
+
+A boxplot (or box-and-whisker) shows the lower whisker (min value > outliers), Q1 (first quartile or 25th percentile), median, Q3 (third quartile or 75th percentile), and upper whisker (max value < outliers). 
+
+We'll talk more about outliers in the coming weeks. For now, let's define outliers as any data smaller than:
+
+$Q1 - 1.5 \times IQR$
+
+or larger than:
+
+$Q3 + 1.5 \times IQR$
+
+where IQR is the inter-quartile range defined as $IQR = Q3-Q1$, Q1 is the 25th percentile, and Q3 is the 75th percentile. 
+---
+### Pop Quiz
+
+Make this terrible plot using the `diamonds` data set, and then never make anything this terrible again.
+
+```{r, echo = FALSE}
+ggplot(data = diamonds) +
+  geom_histogram(mapping = aes(x = carat), fill = 'green', color = 'red') +
+  xlab('Carat of diamond') +
+  coord_flip()
+```
+---
+class: inverse, center, middle
+
+# End of Session 3.1

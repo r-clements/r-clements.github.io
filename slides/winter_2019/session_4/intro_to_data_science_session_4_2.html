@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Data Science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Robert Clements" />
+    <link rel="stylesheet" href="rc_css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Data Science
+## Session 4.2
+### Robert Clements
+
+---
+
+
+
+### Session 4.2 Outline
+
+- Basic Data Import
+  + Data sources
+  + Flat files
+  + *R for Data Science - Section 11*
+  + *Modern Data Science with R - Chapter 5.5*
+- Data Export
+  + Flat files
+
+
+---
+class: inverse, center, middle
+
+# Some motivation for this week: [a Shiny App built in R](http://blog.rdata.lu/visualization/bike/)
+
+---
+class: inverse, center, middle
+# Data Import
+---
+class: inverse, center, middle
+# Where does your data come from?
+---
+### Typical data sources
+
+- Flat files (csv, txt, etc.) 
+- Software specific formats (Excel, MATLAB, SAS, etc.)
+- SQL database (MySQL, MSFT SQL Server, Oracle, etc.) 
+- Hive (Impala, Presto, etc.)
+- HDFS (Hadoop distributed file system)  
+- Web pages (scraping)  
+- API's  
+- NoSQL (Hbase, MongoDB, etc.)
+---
+### Typical data sources **that I use**
+
+- **Flat files (csv, txt, etc.)**  
+- **Software specific formats (Excel, MATLAB, SAS, etc.)**
+- **SQL database (MySQL, MSFT SQL Server, Oracle, etc.)**   
+- **Hive (Impala, Presto, etc.)**  
+- **HDFS (Hadoop distributed file system)**  
+- Web pages (scraping)  
+- API's (application programming interface)  
+- NoSQL (Hbase, MongoDB, etc.)
+
+---
+### Importing data with R
+
+R has packages for importing data from many of the sources listed on the previous slides. We won't be learning big data or databases in this course, but there are separate courses you can take, and the textbook **Modern Data Science with R** has chapters devoted to databases (Ch 12, 13) and spatial data (Ch 14).
+
+For this session we'll focus on:
+
+- flat files  
+
+.center[![](pics/flat_files.png)]
+---
+### Importing flat files with the tidyverse
+
+As always, we will use tidyverse functions for importing flat files into R. Specifically, we are using functions from the `readr` package.
+
+
+```r
+library(tidyverse)
+```
+
+```r
+?readr
+```
+
+`Description: The goal of 'readr' is to provide a fast and friendly way to read rectangular data (like 'csv', 'tsv', and 'fwf'). It is designed to flexibly parse many types of data found in the wild, while still cleanly failing when data unexpectedly changes.`
+---
+### Importing flat files with the tidyverse
+
+Download the flights csv file from Canvas in this week's module, and we'll load it into R using the `readr` package function `read_csv()`. What is the output?
+
+
+```r
+library(tidyverse)
+file_path &lt;- 'path/to/file_name.csv'
+csv_data &lt;- read_csv(file = file_path)
+```
+---
+### Importing flat files with the tidyverse
+
+`read_csv()` has many arguments for dealing with:
+
+- column names (col_names)
+- column types (col_types)
+- missing values (na)
+- white space in fields (trim_ws)
+- skipping rows (skip)
+---
+### Questions
+
+How do the `readr` functions figure out the column types (numerics, characters, etc.) if you don't specify them with the `col_types` argument?
+
+What column types did it assign to each column in the flights.csv file that you imported?
+---
+### Importing flat files with the tidyverse
+
+Not all countries like to use commas as a delimiter. 
+
+For semicolon (`;`) delimited, use `read_csv2()`
+
+For tab delimited, use `read_tsv()`
+
+All others, use `read_delim()` and specify the delimiter with the `delim` argument.
+
+---
+### **FYI**
+
+If importing and working with very large flat files (100s of MBs to GBs), the preferred package for this is the `data.table` package. Read more about it here: [https://github.com/Rdatatable/data.table/wiki](https://github.com/Rdatatable/data.table/wiki)
+---
+class: inverse, center, middle
+# Data Export
+---
+### Exporting into flat files
+
+We can export data into flat files using the same `readr` package. 
+
+`write_csv()` - to write to a csv file  
+`write_tsv()` - to write to a tab delimited file  
+`write_delim()` - to choose a delimiter  
+
+
+```r
+write_delim(csv_data, delim = '|', path = 'path/to/new_file_name.csv')
+```
+---
+### Question
+
+What happens if you try to export the flights data using a colon (`:`) delimiter? Notice the last column?
+
+Try exporting using a few different delimiters. Each time you export the file, open the file in a plain old text editor (not in R) to see what it looks like.
+
+Then you can really challenge yourself and try to load your newly exported data by specifying the delimiter that you chose to export it with.
+
+---
+class: inverse, center, middle
+# R packages for working with data sources
+---
+### R packages
+This list is not exhaustive.  
+
+**`haven`** - SPSS, Stata, and SAS    
+**`readxl`, `XLConnect`** - basic excel files (.xls and .xlsx)  
+**`jsonlite`** - json  
+**`xml2`** - xml  
+**`rvest`** - html  
+**`DBI`** - interface for all sorts of relational databases. Used in conjunction with packages such as **`RODBC`**, **`RSQLite`**, **`RMySQL`**, **`RSQLServer`**, **`RPostgreSQL`**.  
+**`RJDBC`**, **`rJava`** - Hive   
+**`RHadoop`** - hadoop  
+**`twitteR`**, **`Rfacebook`**, more - twitter, facebook, other API's  
+**`h2o`** - h2o  
+**`SparkR`,`sparklyr`** - spark
+---
+class: inverse, center, middle
+
+# End of Session 4.2
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Data Science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Robert Clements" />
+    <link rel="stylesheet" href="rc_css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Data Science
+## Session 6.2
+### Robert Clements
+
+---
+
+
+
+
+
+
+### Session 6.2 Outline
+
+- Fundamental statistics concepts
+  + Why do we need statistics?
+  + Samples and populations
+  + Sample statistics
+  + *Modern Data Science with R - Chapter 7*
+---
+class: inverse, center, middle
+# Statistical concepts
+---
+### Why do we need statistics?
+
+Humans are very good at identifying patterns in visualizations, even with random noise, but...
+  
+
+
+&lt;img src="intro_to_data_science_session_6_2_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+### Why do we need statistics?
+
+humans are also very good at identifying patterns that aren't there. 
+
+Which one of these represents an actual sequence of flipping a fair coin, and which one was a human simulating the flipping of a fair coin?
+
+
+
+A:
+
+`T T T T T T T T T H H T T T T H H T H H H T T T H T H T H T H H T T T H H H T T T H T H T T H T H H H H T H T H H T T H H H T T T T H T T T H T H T H T T H T T T H T H H H T H H T T H H H T T H T T H`
+
+B:
+
+`H T T H T H T H T T H T H H T H H H T H T T H T H T T H T H T H H H T T H H T T H T T H H T H T H T H T T H T H T H T T H T H H T H H H T H T T H T H T T H T H T H H H T T H H T T H T T H H T H T H T`
+
+---
+### Why do we need statistics?
+
+Statistics will help us distinguish between random noise and significant patterns, as well as identify patterns that are too complex to be visualized.
+
+&lt;img src="intro_to_data_science_session_6_2_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Do we still need statistics when we have BIG DATA?
+
+Short answer: yes.
+
+Long answer: we can discuss during Week 10.
+
+
+## `Big Data + Bad Analysis = Big Bad Decisions`
+
+---
+class: inverse, center, middle
+# Populations &amp; Samples
+---
+### Populations
+
+Typically what you are interested in describing:
+
+- The entire population of...
+
+  + customers
+  
+  + users
+  
+  + transactions
+  
+  + etc.
+
+This is the big pool we draw our data from.
+
+---
+### Samples
+
+A *fixed* or *given* set of data from our larger population.
+
+Example: I want to understand all of our users that call in to complain about our products. For various reasons, I do not have access to every single call, so I take a random sample of calls which should be **representative** of the population and do my analysis on that.
+
+.center[![](pics/sample.jpg)]
+
+---
+class: inverse, center, middle
+# Sample Statistics
+---
+### Recall the `flights` data
+
+
+```r
+library(nycflights13)
+glimpse(flights)
+```
+
+```
+## Observations: 336,776
+## Variables: 19
+## $ year           &lt;int&gt; 2013, 2013, 2013, 2013, 2013, 2013, 2013, 2013,...
+## $ month          &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
+## $ day            &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
+## $ dep_time       &lt;int&gt; 517, 533, 542, 544, 554, 554, 555, 557, 557, 55...
+## $ sched_dep_time &lt;int&gt; 515, 529, 540, 545, 600, 558, 600, 600, 600, 60...
+## $ dep_delay      &lt;dbl&gt; 2, 4, 2, -1, -6, -4, -5, -3, -3, -2, -2, -2, -2...
+## $ arr_time       &lt;int&gt; 830, 850, 923, 1004, 812, 740, 913, 709, 838, 7...
+## $ sched_arr_time &lt;int&gt; 819, 830, 850, 1022, 837, 728, 854, 723, 846, 7...
+## $ arr_delay      &lt;dbl&gt; 11, 20, 33, -18, -25, 12, 19, -14, -8, 8, -2, -...
+## $ carrier        &lt;chr&gt; "UA", "UA", "AA", "B6", "DL", "UA", "B6", "EV",...
+## $ flight         &lt;int&gt; 1545, 1714, 1141, 725, 461, 1696, 507, 5708, 79...
+## $ tailnum        &lt;chr&gt; "N14228", "N24211", "N619AA", "N804JB", "N668DN...
+## $ origin         &lt;chr&gt; "EWR", "LGA", "JFK", "JFK", "LGA", "EWR", "EWR"...
+## $ dest           &lt;chr&gt; "IAH", "IAH", "MIA", "BQN", "ATL", "ORD", "FLL"...
+## $ air_time       &lt;dbl&gt; 227, 227, 160, 183, 116, 150, 158, 53, 140, 138...
+## $ distance       &lt;dbl&gt; 1400, 1416, 1089, 1576, 762, 719, 1065, 229, 94...
+## $ hour           &lt;dbl&gt; 5, 5, 5, 5, 6, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 5,...
+## $ minute         &lt;dbl&gt; 15, 29, 40, 45, 0, 58, 0, 0, 0, 0, 0, 0, 0, 0, ...
+## $ time_hour      &lt;dttm&gt; 2013-01-01 05:00:00, 2013-01-01 05:00:00, 2013...
+```
+---
+### Pretend this is the entire population of New York flights
+
+.pull-left[
+
+
+```r
+flights %&gt;% ggplot() +
+  geom_histogram(aes(x = air_time), binwidth = 10) +
+  theme_bw()
+```
+
+&lt;img src="intro_to_data_science_session_6_2_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+.pull-right[
+]
+---
+### Pretend this is the entire population of New York flights
+
+What should a random sample from this population look like?
+
+.pull-left[
+
+
+```r
+flights %&gt;% ggplot() +
+  geom_histogram(aes(x = air_time), binwidth = 10) +
+  theme_bw()
+```
+
+&lt;img src="intro_to_data_science_session_6_2_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+.pull-right[
+]
+---
+### Sample size = 30
+
+.pull-left[
+
+
+```r
+flights %&gt;% ggplot() +
+  geom_histogram(aes(x = air_time), binwidth = 10) +
+  theme_bw()
+```
+
+&lt;img src="intro_to_data_science_session_6_2_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+.pull-right[
+
+```r
+flights %&gt;% sample_n(30) %&gt;% ggplot() +
+  geom_histogram(aes(x = air_time), bindwidth = 10) +
+  theme_bw()
+```
+
+&lt;img src="intro_to_data_science_session_6_2_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+### Sample size = 300
+
+.pull-left[
+
+
+```r
+flights %&gt;% ggplot() +
+  geom_histogram(aes(x = air_time), binwidth = 10) +
+  theme_bw()
+```
+
+&lt;img src="intro_to_data_science_session_6_2_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+.pull-right[
+
+```r
+flights %&gt;% sample_n(300) %&gt;% ggplot() +
+  geom_histogram(aes(x = air_time), binwidth = 10) +
+  theme_bw()
+```
+
+&lt;img src="intro_to_data_science_session_6_2_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+]
+---
+### Sample size = 3000
+.pull-left[
+
+
+```r
+flights %&gt;% ggplot() +
+  geom_histogram(aes(x = air_time), binwidth = 10) +
+  theme_bw()
+```
+
+&lt;img src="intro_to_data_science_session_6_2_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+.pull-right[
+
+```r
+flights %&gt;% sample_n(3000) %&gt;% ggplot() +
+  geom_histogram(aes(x = air_time), binwidth = 10) +
+  theme_bw()
+```
+
+&lt;img src="intro_to_data_science_session_6_2_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+]
+---
+### Pretend this is the entire population of New York flights
+
+.pull-left[
+
+
+```r
+flights %&gt;% summarize(min_time = min(air_time, na.rm = TRUE),
+                      med_time = median(air_time, na.rm = TRUE),
+                      mean_time = mean(air_time, na.rm = TRUE),
+                      IQR_time = IQR(air_time, na.rm = TRUE),
+                      max_time = max(air_time, na.rm = TRUE)) %&gt;%
+  gather(key = stats, value = values)
+```
+
+```
+## # A tibble: 5 x 2
+##   stats     values
+##   &lt;chr&gt;      &lt;dbl&gt;
+## 1 min_time    20.0
+## 2 med_time   129  
+## 3 mean_time  151  
+## 4 IQR_time   110  
+## 5 max_time   695
+```
+
+]
+.pull-right[
+]
+---
+### Sample size = 30
+
+.pull-left[
+
+
+```r
+flights %&gt;% summarize(min_time = min(air_time, na.rm = TRUE),
+                      med_time = median(air_time, na.rm = TRUE),
+                      mean_time = mean(air_time, na.rm = TRUE),
+                      IQR_time = IQR(air_time, na.rm = TRUE),
+                      max_time = max(air_time, na.rm = TRUE)) %&gt;%
+  gather(key = stats, value = values)
+```
+
+```
+## # A tibble: 5 x 2
+##   stats     values
+##   &lt;chr&gt;      &lt;dbl&gt;
+## 1 min_time    20.0
+## 2 med_time   129  
+## 3 mean_time  151  
+## 4 IQR_time   110  
+## 5 max_time   695
+```
+
+]
+.pull-right[
+
+```r
+flights %&gt;% sample_n(30) %&gt;% summarize(min_time = min(air_time, na.rm = TRUE),
+                      med_time = median(air_time, na.rm = TRUE),
+                      mean_time = mean(air_time, na.rm = TRUE),
+                      IQR_time = IQR(air_time, na.rm = TRUE),
+                      max_time = max(air_time, na.rm = TRUE)) %&gt;%
+  gather(key = stats, value = values)
+```
+
+```
+## # A tibble: 5 x 2
+##   stats     values
+##   &lt;chr&gt;      &lt;dbl&gt;
+## 1 min_time    39.0
+## 2 med_time   133  
+## 3 mean_time  180  
+## 4 IQR_time   218  
+## 5 max_time   383
+```
+]
+
+---
+### Sample size = 300
+
+.pull-left[
+
+
+```r
+flights %&gt;% summarize(min_time = min(air_time, na.rm = TRUE),
+                      med_time = median(air_time, na.rm = TRUE),
+                      mean_time = mean(air_time, na.rm = TRUE),
+                      IQR_time = IQR(air_time, na.rm = TRUE),
+                      max_time = max(air_time, na.rm = TRUE)) %&gt;%
+  gather(key = stats, value = values)
+```
+
+```
+## # A tibble: 5 x 2
+##   stats     values
+##   &lt;chr&gt;      &lt;dbl&gt;
+## 1 min_time    20.0
+## 2 med_time   129  
+## 3 mean_time  151  
+## 4 IQR_time   110  
+## 5 max_time   695
+```
+
+]
+.pull-right[
+
+```r
+flights %&gt;% sample_n(300) %&gt;% summarize(min_time = min(air_time, na.rm = TRUE),
+                      med_time = median(air_time, na.rm = TRUE),
+                      mean_time = mean(air_time, na.rm = TRUE),
+                      IQR_time = IQR(air_time, na.rm = TRUE),
+                      max_time = max(air_time, na.rm = TRUE)) %&gt;%
+  gather(key = stats, value = values)
+```
+
+```
+## # A tibble: 5 x 2
+##   stats     values
+##   &lt;chr&gt;      &lt;dbl&gt;
+## 1 min_time    22.0
+## 2 med_time   130  
+## 3 mean_time  145  
+## 4 IQR_time    87.2
+## 5 max_time   609
+```
+]
+---
+### Sample size = 3000
+.pull-left[
+
+
+```r
+flights %&gt;% summarize(min_time = min(air_time, na.rm = TRUE),
+                      med_time = median(air_time, na.rm = TRUE),
+                      mean_time = mean(air_time, na.rm = TRUE),
+                      IQR_time = IQR(air_time, na.rm = TRUE),
+                      max_time = max(air_time, na.rm = TRUE)) %&gt;%
+  gather(key = stats, value = values)
+```
+
+```
+## # A tibble: 5 x 2
+##   stats     values
+##   &lt;chr&gt;      &lt;dbl&gt;
+## 1 min_time    20.0
+## 2 med_time   129  
+## 3 mean_time  151  
+## 4 IQR_time   110  
+## 5 max_time   695
+```
+
+]
+.pull-right[
+
+```r
+flights %&gt;% sample_n(3000) %&gt;% summarize(min_time = min(air_time, na.rm = TRUE),
+                      med_time = median(air_time, na.rm = TRUE),
+                      mean_time = mean(air_time, na.rm = TRUE),
+                      IQR_time = IQR(air_time, na.rm = TRUE),
+                      max_time = max(air_time, na.rm = TRUE)) %&gt;%
+  gather(key = stats, value = values)
+```
+
+```
+## # A tibble: 5 x 2
+##   stats     values
+##   &lt;chr&gt;      &lt;dbl&gt;
+## 1 min_time    22.0
+## 2 med_time   129  
+## 3 mean_time  149  
+## 4 IQR_time   107  
+## 5 max_time   676
+```
+]
+---
+### Uncertainty
+
+We will not cover confidence intervals in this class (don't be bummed), but this is a topic worth studying.
+
+BUT...
+
+let's talk about the standard error!!
+
+### Standard error `\(\neq\)` standard deviation
+---
+### Uncertainty and the Standard Error
+
+Take a sample of flights, of size n = 300, and calculate the mean and standard deviation of `air_time`...
+
+
+```r
+flights %&gt;% sample_n(300) %&gt;% 
+  summarize(mean_time = mean(air_time, na.rm = TRUE),
+                        sd_time = sd(air_time, na.rm = TRUE))
+```
+
+...and repeat. What do you notice?
+---
+### Uncertainty and the Standard Error
+
+You should have noticed that each time you take a new sample, the mean and standard deviation of `air_time` changes a little.
+
+If we repeat this over and over again and collect all results, we can look at the distributions of the sample mean and sample standard deviation.
+
+What do you think a histogram of all of your sample means will look like?
+
+--
+
+&lt;img src="intro_to_data_science_session_6_2_files/figure-html/unnamed-chunk-23-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Uncertainty and the Standard Error
+
+You should have noticed that each time you take a new sample, the mean and standard deviation of `air_time` changes a little.
+
+If we repeat this over and over again and collect all results, we can look at the distributions of the sample mean and sample standard deviation.
+
+&lt;img src="intro_to_data_science_session_6_2_files/figure-html/unnamed-chunk-24-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Uncertainty and the Standard Error
+
+The standard error is the standard deviation (spread) *of the sampling distribution* - it is a measure of the spread of our sample statistics (the sample average in the plot below).
+
+In this case, the standard error (standard deviation of our sample means) is 5.4475642.
+
+&lt;img src="intro_to_data_science_session_6_2_files/figure-html/unnamed-chunk-25-1.png" style="display: block; margin: auto;" /&gt;
+---
+### FUN FACT
+
+The theoretical formula for the standard error is:
+
+`$$\huge \frac{\sigma}{\sqrt{N}}$$`
+
+where `\(\Huge \sigma\)` is the standard deviation of our **population**, and N is the sample size. 
+
+In our case (`\(\Huge \sigma\)` = 93.6883047, N = 300)
+
+
+```r
+sd(flights$air_time, na.rm = TRUE)/sqrt(300)
+```
+
+```
+## [1] 5.409097
+```
+
+This is pretty darn close to what we got: 5.4475642
+
+---
+### Pop Quiz
+
+- What do you think is the mean (center) of this distribution?
+
+- What do you think happens to the standard error if our sample size **increases**?
+
+- What do you think happens to the shape of this distribution if our sample size **decreases**?
+
+&lt;img src="intro_to_data_science_session_6_2_files/figure-html/unnamed-chunk-27-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+class: inverse, center, middle
+
+# End of Session 6.2
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

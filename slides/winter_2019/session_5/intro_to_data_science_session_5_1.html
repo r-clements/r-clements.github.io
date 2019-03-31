@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Data Science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Robert Clements" />
+    <link rel="stylesheet" href="rc_css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Data Science
+## Session 5.1
+### Robert Clements
+
+---
+
+
+
+
+### Housekeeping
+
+- Questions on Homework 4?
+- Questions about the Midterm?
+- Homework 3 solutions are up
+- Midterm will be released by tonight after 9:30PM
+  + Midterm is due next Tuesday by 6:15PM
+  + Remember, no working together on the midterm
+  + Late midterms will get a **zero** grade
+  + We will review the midterm in class during Week 7
+
+---
+### Session 5.1 Outline
+
+- A little more motivation
+- Professional Ethics
+  + *Modern Data Science with R - Chapter 6*
+---
+class: inverse, center, middle
+## A little more motivation for learning R:
+### [This article on climate change](https://www.kron4.com/news/bay-area/what-will-weather-be-like-in-san-francisco-in-60-years-more-like-los-angeles-study-says/1797903052) along with [this Shiny web application](https://fitzlab.shinyapps.io/cityapp/).
+---
+class: inverse, center, middle
+# Professional Ethics
+---
+class: inverse, center, middle
+# Question: Do we need a Hippocratic Oath for data scientists? Why or why not?
+---
+### The Oath
+
+- I will not be ashamed to say 'I know not', nor will I fail to call in my colleagues when the skills of another are needed
+
+- I will respect the privacy of my patients
+
+- I will remember that I remain a member of society, with special obligations to all my fellow human beings
+---
+class: center, middle
+# Is there anything ethically wrong about the following charts?
+---
+.center[![](pics/florida.jpg)]
+---
+.center[![](pics/climate.png)]
+---
+### Convention
+
+In data graphics, *up* corresponds to increasing values. We are taught this from the first time we draw cartesian coordinates.
+
+.center[![](pics/florida_small.jpg)]
+---
+### Convention
+
+We also expect the scale of our axes to provide the context we need to interpret the data correctly.
+
+.center[![](pics/climate_small.png)]
+---
+### Playing God
+
+There are stories in the text, but here's a personal anecdote.
+
+*I once had a project to develop models that could predict when a specific part of a jet engine would fail to the point of being irreparable. The results of the model could potentially allow the company to book a certain amount of future savings ($). The data was sparse, and highly variable, and I couldn't get a robust model out of it - I showed the managers that even slight changes in the data lead to a wildly different model. The managers were under such intense pressure to find millions in savings that they took the model's best results, and ignored the bad results.*
+---
+### p-hacking
+
+.center[![](pics/phack.png)]
+---
+### Reproducibility
+
+I harp on this all of the time, and this article is one reason why.
+
+[Growth in a Time of Debt](http://www.nber.org/papers/w15639) - Ken Rogoff and Carmen Reinhart. 
+
+This is an article that argued that austerity policies don't lead to slow economic growth.
+
+Thomas Herndon, Michael Ash and Robert Pollin were able to get the original Excel file from the authors to try to reproduce their analysis. In a critique published in the Cambridge Journal of Economics they concluded that they found:
+
+- coding errors
+- selective exclusion of data
+- unconventional weighting of summary statistics
+
+More critiques were later released.
+---
+### Consent
+
+- In 2016, [OpenPsych published a large data set](https://www.wired.com/2016/05/okcupid-study-reveals-perils-big-data-science/) of users of the OKCupid dating site for psychological research. They did not anonymize the data, saying instead "the data is already public".
+
+.center[![](pics/okcupid.png)]
+
+---
+### Consent
+
+- In 2012, Facebook [performed a week long experiment](https://www.forbes.com/sites/kashmirhill/2014/06/28/facebook-manipulated-689003-users-emotions-for-science/#52f4237e197c) on its users. The goal was to manipulate users' news feeds to see if it affects their mood. 
+
+.center[![](pics/fb.png)]
+---
+### Consent
+
+- In 2018, it was revealed that Facebook data for 87 million users' information was obtained by Cambridge Analytica.
+
+[Wikipedia article](https://en.wikipedia.org/wiki/Facebook%E2%80%93Cambridge_Analytica_data_scandal)
+---
+### Data and disclosure, safe data storage, terms of use, and reproducibility
+
+
+- **Disclosure avoidance** 
+  + The Health Insurance Portability and Accountability Act (HIPAA) regulates how Protected Health Information (PHI) is shared. 
+- **Data storage** 
+  + Safe data storage is critical (tons of examples of protected data being stolen)
+- **Terms of Use**
+  + Often explicitly details what data, how often, and how it can be used
+- **Reproducible analysis** - 
+  + Data - all original data retained
+  + Metadata - codebooks and data dictionaries
+  + Commands - actual code
+  + Map - a file that maps between output and results in the report
+---
+class: inverse, center, middle
+
+# End of Session 5.1
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

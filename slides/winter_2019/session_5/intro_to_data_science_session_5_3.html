@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Data Science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Robert Clements" />
+    <link rel="stylesheet" href="rc_css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Data Science
+## Session 5.3
+### Robert Clements
+
+---
+
+
+
+
+### Session 5.3 Outline
+
+- EDA
+  + Covariation and Correlation
+  + Patterns and Models
+  + *R for Data Science - Chapter 7*
+---
+class: inverse, center, middle
+# Exploratory Data Analysis
+---
+### Covariation and Correlation
+
+Covariation is the tendency for the values of two or more variables to vary together in a related way.
+
+There are three scenarios to deal with:
+
+1. **One categorical and one continuous variable**
+
+2. Two categorical variables
+
+3. Two continuous variables.
+
+---
+### Visualizing covariation
+
+Scenario 1: use boxplots.
+
+What is a surprising finding from this plot?
+
+
+```r
+library(tidyverse)
+
+ggplot(data = diamonds, mapping = aes(x = cut, y = price)) + 
+  geom_boxplot()
+```
+
+&lt;img src="intro_to_data_science_session_5_3_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Visualizing covariation
+
+Scenario 1: use boxplots.
+
+Sometimes R doesn't know in advance that our categorical variable is ordinal. Or, sometimes you simply want to reorder a variable for visual reasons.
+
+
+```r
+ggplot(data = mpg, mapping = aes(x = class, y = hwy)) +
+  geom_boxplot()
+```
+
+&lt;img src="intro_to_data_science_session_5_3_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Visualizing covariation
+
+Scenario 1: use boxplots.
+
+Sometimes R doesn't know in advance that our categorical variable is ordinal. Or, sometimes you simply want to reorder a variable for visual reasons. Let's reorder `class` by the median of `hwy`.
+
+
+```r
+ggplot(data = mpg) +
+  geom_boxplot(mapping = aes(x = reorder(class, hwy, FUN = median), y = hwy))
+```
+
+&lt;img src="intro_to_data_science_session_5_3_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Pop Quiz
+
+Sometimes category names are large and so it would make sense to plot boxplots on the y-axis. Reproduce this plot from the `diamonds` data set:
+
+&lt;img src="intro_to_data_science_session_5_3_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Covariation and Correlation
+
+Covariation is the tendency for the values of two or more variables to vary together in a related way.
+
+There are three scenarios to deal with:
+
+1. One categorical and one continuous variable
+
+2. **Two categorical variables**
+
+3. Two continuous variables.
+
+---
+### Visualizing covariation
+
+Scenario 2: use a heatmap (not a mosaic) with added text using `geom_tile()` and `geom_text()`.
+
+What do we notice about the color and cut of diamonds?
+
+
+```r
+diamonds %&gt;% 
+  count(color, cut) %&gt;% 
+  ggplot(mapping = aes(x = color, y = cut)) +
+  geom_tile(mapping = aes(fill = n)) +
+  geom_text(aes(label = n), color = 'white')
+```
+
+&lt;img src="intro_to_data_science_session_5_3_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Covariation and Correlation
+
+Covariation is the tendency for the values of two or more variables to vary together in a related way.
+
+There are three scenarios to deal with:
+
+1. One categorical and one continuous variable
+
+2. Two categorical variables
+
+3. **Two continuous variables**.
+
+---
+### Visualizing covariation
+
+Scenario 3: use scatterplots.
+
+What is wrong with this plot? What are some suggestions for fixing it?
+
+
+```r
+ggplot(data = diamonds) +
+  geom_point(mapping = aes(x = carat, y = price))
+```
+
+&lt;img src="intro_to_data_science_session_5_3_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Visualizing covariation with larger data sets
+
+Scenario 3: use 2-d binning with the `geom_bin2d()` geom.
+
+
+```r
+ggplot(data = diamonds) +
+  geom_bin2d(mapping = aes(x = carat, y = price))
+```
+
+&lt;img src="intro_to_data_science_session_5_3_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Patterns and models
+
+Patterns reveal possible relationships. Ask yourself these questions when you spot a pattern:
+
+1. Is the pattern due to random chance?
+
+2. What does the relationship look like? Is it positive, negative, up down? Describe it.
+
+3. How strong is the relationship? Weak? Strong? So-so?
+
+4. Are there other variables that might affect this relationship?
+
+5. Does the relationship change if you look at subgroups of the data?
+---
+### The importance of patterns
+
+Patterns reveal covariation (or correlation). Although *variance* is a measure of uncertainty and spread, *covariance* can actually help **reduce** uncertainty. If two (or more) variables have high covariance, you can use the values of one (or more) to predict, or explain, the values of another.
+
+In rare cases of causal relationships, you can use the value of a variable to **control** the value of another.
+
+We can use *models* to help us extract patterns out of data.
+---
+### Patterns and models
+
+Look at the pattern in this histogram of eruption times of Old Faithful in Yellowstone National Park.
+
+Why does this pattern exist? Is it random? Is it a strong pattern?
+
+
+```r
+ggplot(data = faithful, aes(x = eruptions)) +
+  geom_histogram() +
+  xlab('Eruption time in minutes')
+```
+
+&lt;img src="intro_to_data_science_session_5_3_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Pop Quiz
+
+This is a histogram of the eruption times (in minutes) of the Old Faithful geyser in Yellowstone National Park. What might explain this shape?
+
+&lt;img src="intro_to_data_science_session_5_3_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Pop Quiz
+
+Look at the `faithful` data set and ask yourself: is there a variable that might affect the pattern seen below? If so, make a plot that reveals the reason for the pattern seen in this histogram. What is the reason?
+
+&lt;img src="intro_to_data_science_session_5_3_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Your first taste of a model
+
+Remember this counterintuitive graphic?
+
+How can we explain this result?
+
+
+```r
+ggplot(data = diamonds, mapping = aes(x = cut, y = price)) + 
+  geom_boxplot()
+```
+
+&lt;img src="intro_to_data_science_session_5_3_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Your first taste of a model
+
+The pattern between carat and price is strong, positive, and explainable. Let's go back to our list of questions.
+
+
+```r
+ggplot(data = diamonds) +
+  geom_bin2d(mapping = aes(x = carat, y = price))
+```
+
+&lt;img src="intro_to_data_science_session_5_3_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Your first taste of a model
+
+1. Is the pattern due to random chance?
+2. What does the relationship look like? Is it positive, negative, up, down? Describe it.
+3. How strong is the relationship? Weak? Strong? So-so?
+4. Are there other variables that might affect this relationship? **ding! ding! ding!**
+5. Does the relationship change if you look at subgroups of the data?
+
+
+```r
+ggplot(data = diamonds) +
+  geom_bin2d(mapping = aes(x = carat, y = price))
+```
+
+&lt;img src="intro_to_data_science_session_5_3_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+---
+### Thought experiment
+
+How might we reveal a more intuitive pattern between the price and cut of diamonds by considering the very complex relationships between price, carat, and cut? 
+
+
+---
+class: inverse, center, middle
+
+# End of Session 5.3
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

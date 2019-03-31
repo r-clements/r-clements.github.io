@@ -1,0 +1,244 @@
+---
+title: "Introduction to Data Science"
+subtitle: "Session 10.2"
+author: "Robert Clements"
+date: ""
+output:
+  xaringan::moon_reader:
+    css: rc_css.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(fig.align = "center", fig.asp=.5, message = FALSE, warning = FALSE)
+```
+### Session 10.2 Outline
+
+- Shiny apps
+---
+class: inverse, center, middle
+# Shiny apps
+---
+### What is Shiny?
+
+`shiny` is an R package that makes it easy to build interactive web apps straight from R. You can host standalone apps on a webpage or embed them in R Markdown documents or build dashboards. You can also extend your Shiny apps with CSS themes, htmlwidgets, and JavaScript actions.
+
+You **do not need** to know `html`, `javascript` or `CSS` in order to build these apps. You only need to know `R`.
+
+Best way to learn is by doing some simple examples here:
+
+[https://shiny.rstudio.com/](https://shiny.rstudio.com/)
+---
+### Why bother?
+
+Why use Shiny when you can use Tableau, Spotfire, Excel, etc.?
+
+*Because Shiny has the power of R working behind it - meaning that almost anything you can do in R, you can do in a Shiny App.*
+
+- Complex data processing
+
+- Data exploration
+
+- Model fitting
+
+- Interactive visualizations
+
+---
+### Two components of a Shiny app
+
+- The UI (user interface) object - defines what you'll see in your browser
+
+- The server function - the code that takes inputs and creates outputs
+---
+### Let's run an example
+
+
+```{r, eval = FALSE}
+library(shiny)
+
+runExample('01_hello')
+```
+
+See [https://shiny.rstudio.com/articles/basics.html](https://shiny.rstudio.com/articles/basics.html) for the source code of the `01_hello` app.
+
+---
+### Now let's recreat the app from scratch
+
+Open a new R script and type in:
+
+```{r, eval = FALSE}
+library(shiny)
+ui <- fluidPage(
+  # App title ----
+  titlePanel("Hello Shiny!")
+)
+
+server <- function(input, output) {
+  # Empty server function
+}
+```
+---
+### Run the app
+
+```{r, eval = FALSE}
+shinyApp(ui, server)
+```
+---
+### Create the skeleton for the UI
+
+```{r, eval = FALSE}
+ui <- fluidPage(
+  # App title ----
+  titlePanel("Hello Shiny!"),
+  
+  # Sidebar layout with input and output definitions ----
+  sidebarLayout(
+    
+    # Sidebar panel for inputs ----
+    sidebarPanel(
+    ),
+    
+    # Main panel for displaying outputs ----
+    mainPanel(
+    )
+  )
+)
+```
+---
+### Run the app
+
+```{r, eval = FALSE}
+shinyApp(ui, server)
+```
+---
+### Add a slider input to the UI
+
+```{r, eval = FALSE}
+ui <- fluidPage(
+  # App title ----
+  titlePanel("Hello Shiny!"),
+  
+  # Sidebar layout with input and output definitions ----
+  sidebarLayout(
+    
+    # Sidebar panel for inputs ----
+    sidebarPanel(
+      # Input: Slider for the number of bins ----
+      sliderInput(inputId = "bins",
+                  label = "Number of bins:",
+                  min = 1,
+                  max = 50,
+                  value = 30)
+    ),
+    
+    # Main panel for displaying outputs ----
+    mainPanel(
+    )
+  )
+)
+```
+---
+### Add a plot output to the UI
+
+```{r, eval = FALSE}
+ui <- fluidPage(
+  # App title ----
+  titlePanel("Hello Shiny!"),
+  
+  # Sidebar layout with input and output definitions ----
+  sidebarLayout(
+    
+    # Sidebar panel for inputs ----
+    sidebarPanel(
+      # Input: Slider for the number of bins ----
+      sliderInput(inputId = "bins",
+                  label = "Number of bins:",
+                  min = 1,
+                  max = 50,
+                  value = 30)
+    ),
+    
+    # Main panel for displaying outputs ----
+    mainPanel(
+      # Output: Histogram ----
+      plotOutput(outputId = "distPlot")
+    )
+  )
+)
+```
+---
+### Run the app
+
+```{r, eval = FALSE}
+shinyApp(ui, server)
+```
+---
+### Take a look at the `ui` object
+
+```{r, eval = FALSE}
+ui
+```
+---
+### Now let's work on the server code
+```{r, eval = FALSE}
+server <- function(input, output) {
+  
+  # Load packages
+  library(tidyverse)
+}
+```
+---
+### Create our plot
+```{r, eval = FALSE}
+server <- function(input, output) {
+  
+  # Load packages
+  library(tidyverse)
+  
+  # Histogram of the Old Faithful Geyser Data ----
+  # with requested number of bins
+  output$distPlot <- renderPlot({
+
+  })
+}
+```
+---
+### Run the app
+
+```{r, eval = FALSE}
+shinyApp(ui, server)
+```
+---
+### Use the input from the slider to define the plot
+```{r, eval = FALSE}
+server <- function(input, output) {
+  
+  # Load packages
+  library(tidyverse)
+  
+  # Histogram of the Old Faithful Geyser Data ----
+  # with requested number of bins
+  output$distPlot <- renderPlot({
+    faithful %>% ggplot(aes(x = waiting)) +
+      geom_histogram(bins = input$bins) +
+      theme_bw()
+  })
+}
+```
+---
+### Run the app
+
+```{r, eval = FALSE}
+shinyApp(ui, server)
+```
+---
+class: inverse, center, middle
+
+# End of Session 10.2
