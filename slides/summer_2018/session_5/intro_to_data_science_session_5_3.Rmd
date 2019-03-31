@@ -1,0 +1,248 @@
+---
+title: "Introduction to Data Science"
+subtitle: "Session 5.3"
+author: "Robert Clements"
+date: ""
+output:
+  xaringan::moon_reader:
+    css: rc_css.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(fig.align = "center", fig.asp=.5, message = FALSE, warning = FALSE)
+```
+
+### Session 5.3 Outline
+
+- EDA
+  + Covariation and Correlation
+  + Patterns and Models
+  + *R for Data Science - Chapter 7*
+---
+class: inverse, center, middle
+# Exploratory Data Analysis
+---
+### Covariation and Correlation
+
+Covariation is the tendency for the values of two or more variables to vary together in a related way.
+
+There are three scenarios to deal with:
+
+1. **One categorical and one continuous variable**
+
+2. Two categorical variables
+
+3. Two continuous variables.
+
+---
+### Visualizing covariation
+
+Scenario 1: use boxplots.
+
+What is a surprising finding from this plot?
+
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+
+ggplot(data = diamonds, mapping = aes(x = cut, y = price)) + 
+  geom_boxplot()
+
+```
+---
+### Visualizing covariation
+
+Scenario 1: use boxplots.
+
+Sometimes R doesn't know in advance that our categorical variable is ordinal. Or, sometimes you simply want to reorder a variable for visual reasons.
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = class, y = hwy)) +
+  geom_boxplot()
+```
+---
+### Visualizing covariation
+
+Scenario 1: use boxplots.
+
+Sometimes R doesn't know in advance that our categorical variable is ordinal. Or, sometimes you simply want to reorder a variable for visual reasons. Let's reorder `class` by the median of `hwy`.
+
+```{r}
+ggplot(data = mpg) +
+  geom_boxplot(mapping = aes(x = reorder(class, hwy, FUN = median), y = hwy))
+```
+---
+### Pop Quiz
+
+Sometimes category names are large and so it would make sense to plot boxplots on the y-axis. Reproduce this plot from the `diamonds` data set:
+
+```{r, echo = FALSE}
+ggplot(data = diamonds, mapping = aes(x = reorder(cut, price, FUN = median), y = price)) + 
+  geom_boxplot() +
+  xlab('CUT') +
+  ylab('PRICE') +
+  coord_flip()
+```
+---
+### Covariation and Correlation
+
+Covariation is the tendency for the values of two or more variables to vary together in a related way.
+
+There are three scenarios to deal with:
+
+1. One categorical and one continuous variable
+
+2. **Two categorical variables**
+
+3. Two continuous variables.
+
+---
+### Visualizing covariation
+
+Scenario 2: use a heatmap (not a mosaic) with added text using `geom_tile()` and `geom_text()`.
+
+What do we notice about the color and cut of diamonds?
+
+```{r}
+diamonds %>% 
+  count(color, cut) %>% 
+  ggplot(mapping = aes(x = color, y = cut)) +
+  geom_tile(mapping = aes(fill = n)) +
+  geom_text(aes(label = n), color = 'white')
+```
+---
+### Covariation and Correlation
+
+Covariation is the tendency for the values of two or more variables to vary together in a related way.
+
+There are three scenarios to deal with:
+
+1. One categorical and one continuous variable
+
+2. Two categorical variables
+
+3. **Two continuous variables**.
+
+---
+### Visualizing covariation
+
+Scenario 3: use scatterplots.
+
+What is wrong with this plot? What are some suggestions for fixing it?
+
+```{r}
+ggplot(data = diamonds) +
+  geom_point(mapping = aes(x = carat, y = price))
+```
+---
+### Visualizing covariation with larger data sets
+
+Scenario 3: use 2-d binning with the `geom_bin2d()` geom.
+
+```{r}
+ggplot(data = diamonds) +
+  geom_bin2d(mapping = aes(x = carat, y = price))
+```
+---
+### Patterns and models
+
+Patterns reveal possible relationships. Ask yourself these questions when you spot a pattern:
+
+1. Is the pattern due to random chance?
+
+2. What does the relationship look like? Is it positive, negative, up down? Describe it.
+
+3. How strong is the relationship? Weak? Strong? So-so?
+
+4. Are there other variables that might affect this relationship?
+
+5. Does the relationship change if you look at subgroups of the data?
+---
+### The importance of patterns
+
+Patterns reveal covariation (or correlation). Although *variance* is a measure of uncertainty and spread, *covariance* can actually help **reduce** uncertainty. If two (or more) variables have high covariance, you can use the values of one (or more) to predict, or explain, the values of another.
+
+In rare cases of causal relationships, you can use the value of a variable to **control** the value of another.
+
+We can use *models* to help us extract patterns out of data.
+---
+### Patterns and models
+
+Look at the pattern in this histogram of eruption times of Old Faithful in Yellowstone National Park.
+
+Why does this pattern exist? Is it random? Is it a strong pattern?
+
+```{r}
+ggplot(data = faithful, aes(x = eruptions)) +
+  geom_histogram() +
+  xlab('Eruption time in minutes')
+```
+---
+### Pop Quiz
+
+This is a histogram of the eruption times (in minutes) of the Old Faithful geyser in Yellowstone National Park. What might explain this shape?
+
+```{r, echo=FALSE}
+ggplot(data = faithful, aes(x = eruptions)) +
+  geom_histogram() +
+  xlab('Eruption time in minutes')
+```
+---
+### Pop Quiz
+
+Look at the `faithful` data set and ask yourself: is there a variable that might affect the pattern seen below? If so, make a plot that reveals the reason for the pattern seen in this histogram. What is the reason?
+
+```{r, echo=FALSE}
+ggplot(data = faithful, aes(x = eruptions)) +
+  geom_histogram() +
+  xlab('Eruption time in minutes')
+```
+---
+### Your first taste of a model
+
+Remember this counterintuitive graphic?
+
+How can we explain this result?
+
+```{r, warning=FALSE, message=FALSE}
+ggplot(data = diamonds, mapping = aes(x = cut, y = price)) + 
+  geom_boxplot()
+
+```
+---
+### Your first taste of a model
+
+The pattern between carat and price is strong, positive, and explainable. Let's go back to our list of questions.
+
+```{r}
+ggplot(data = diamonds) +
+  geom_bin2d(mapping = aes(x = carat, y = price))
+```
+---
+### Your first taste of a model
+
+1. Is the pattern due to random chance?
+2. What does the relationship look like? Is it positive, negative, up, down? Describe it.
+3. How strong is the relationship? Weak? Strong? So-so?
+4. Are there other variables that might affect this relationship? **ding! ding! ding!**
+5. Does the relationship change if you look at subgroups of the data?
+
+```{r}
+ggplot(data = diamonds) +
+  geom_bin2d(mapping = aes(x = carat, y = price))
+```
+---
+### Thought experiment
+
+How might we reveal a more intuitive pattern between the price and cut of diamonds by considering the very complex relationships between price, carat, and cut? 
+
+
+---
+class: inverse, center, middle
+
+# End of Session 5.3

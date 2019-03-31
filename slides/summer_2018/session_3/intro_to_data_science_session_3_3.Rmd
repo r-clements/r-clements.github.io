@@ -1,0 +1,426 @@
+---
+title: "Introduction to Data Science"
+subtitle: "Session 3.3"
+author: "Robert Clements"
+date: ""
+output:
+  xaringan::moon_reader:
+    css: rc_css.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(fig.align = "center", fig.asp=.5, message = FALSE, warning = FALSE)
+```
+
+```{r, echo = FALSE,warning=FALSE, message=FALSE}
+library(ggplot2)
+```
+
+### Session 3.3 Outline
+
+- Data Views
+- Data Wrangling
+  + *Modern Data Science with R - Chapter 4*
+  + *R for Data Science - Section 5*
+---
+class: inverse, middle, center
+# Data Views
+---
+### Viewing your data
+
+Up until now we've seen at least three ways to view your data:
+
+- `View()`: shows a table in the Source pane
+- `glimpse()`: shows variables, types, and a few values
+- `head()`: shows the first `n` rows or entries
+- `tail()`: shows the last `n` rows or entries
+
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+glimpse(diamonds)
+```
+
+---
+### Viewing your data
+
+To see just the column names:
+
+
+```{r}
+names(diamonds)
+```
+
+---
+### Viewing your data
+
+To see the object **type**:
+
+```{r}
+class(diamonds)
+```
+
+OK, so what does `tbl_df`, `tbl` and `data.frame` even mean?
+---
+class: inverse, middle, center
+# Data Wrangling
+---
+### `dplyr` package
+
+Once again we will use the amazing `tidyverse` set of packages to do our data wrangling. Specifically, we will be using `dplyr`.
+
+- All functions we look at today work like this:
+
+  + take a `data.frame` (or `tibble`) as the first argument
+  
+  + subsequent arguments describe what to do and uses unquoted variable names
+  
+  + return a new `data.frame` (or `tibble`) object
+  
+```{r, eval=FALSE}
+function_name(data.frame, what to do and with which variables)
+```
+
+---
+### Tibbles? Data frames?
+
+- A `tibble` is a `data.frame`, but with some special characteristics that we'll learn about later
+
+  + Recall that a `data.frame` is like a table with rows of observations and columns of variables (can be of different *types*) 
+  
+  + We've been using data frames and tibbles as our data sets for ggplot all along
+
+---
+### `dplyr` functions and the `%>%` pipe
+
+- Since each function takes and returns the same type of object, they are perfect functions for chaining
+
+  + Recall the pipe operator: `%>%`
+  
+  + The pipe works left-to-right by plugging in the output of what's on the left as the first argument of what's on the right
+  
+  `function_1 %>% function_2 %>% function_3 %>% ...` 
+  
+  is read 
+  
+  `function_1 then function_2 then function_3 then ...`
+  
+---
+### `dplyr` functions and the `%>%` pipe
+
+Suppose we have a group of nested functions where we want to:
+
+- filter the data
+- select a column
+- and then take the average of that column
+
+```{r, eval = FALSE}
+mean(select(filter(data_name, filter_condition), column_name))
+```
+
+OR, using the pipe:
+
+```{r, eval = FALSE}
+data_name %>% filter(filter_condition) %>% select(column_name) %>% mean()
+```
+---
+### Grammar for data wrangling
+
+There are five verbs for working with data in a data frame:
+
+- `select()` - take a subset of columns
+
+- `filter()` - take a subset of rows
+
+- `mutate()` - add or modify existing columns
+
+- `arrange()` - sort the rows
+
+- `summarize()` - aggregate the data across rows (by groups)
+
+---
+### Grammar for data wrangling
+
+There are five verbs for working with data in a data frame:
+
+- **`select()` - take a subset of columns**
+
+- `filter()` - take a subset of rows
+
+- `mutate()` - add or modify existing columns
+
+- `arrange()` - sort the rows
+
+- `summarize()` - aggregate the data across rows (by groups)
+
+---
+### The `flights` data
+```{r, echo=FALSE}
+library(nycflights13)
+library(tidyverse)
+```
+```{r, echo=FALSE}
+glimpse(flights)
+```
+---
+### The `select()` verb
+
+```{r}
+select(flights, year, month, day)
+```
+
+---
+### The `select()` verb
+
+```{r}
+select(flights, year:day)
+```
+---
+### The `select()` verb
+
+```{r}
+select(flights, -(year:day))
+```
+---
+### The `select()` verb - helper functions
+
+```{r}
+select(flights, starts_with('d'))
+```
+---
+### The `select()` verb - helper functions
+
+There are many more helper functions. Your task: figure out what all of these do.
+
+- `ends_with()`
+
+- `contains()`
+
+- `matches()`
+
+- `num_range()`
+
+- `everything()`
+
+---
+### Grammar for data wrangling
+
+There are five verbs for working with data in a data frame:
+
+- `select()` - take a subset of columns
+
+- **`filter()` - take a subset of rows**
+
+- `mutate()` - add or modify existing columns
+
+- `arrange()` - sort the rows
+
+- `summarize()` - aggregate the data across rows (by groups)
+
+---
+### The `filter()` verb
+
+```{r}
+filter(flights, month == 1, day == 1)
+```
+
+---
+### The `filter()` verb
+
+Comparisons:
+
+- Less than: `<`
+
+- Greather than: `>`
+
+- Less than or equal to: `<=`
+
+- Greater than or equal to: `>=`
+
+- Not equal to: `!=`
+
+- Equal to: `==`
+
+- Equal to (for continuous numbers): `near()`
+---
+### The `filter()` verb
+
+Logicals:
+
+- And: `&`
+
+- Or: `|`
+
+- Not: `!`
+
+.center[![](pics/transform-logical.png)]
+---
+### The `filter()` verb
+
+```{r}
+filter(flights, month == 11 | month == 12)
+```
+---
+### The `filter()` verb
+
+```{r}
+filter(flights, month %in% c(11, 12))
+```
+
+---
+### Pop Quiz
+
+Without writing code, how would we find all flights in the `flights` data in January, Febuary, and April that departed before 6:00AM or after 6:00PM and had arrival delay of more than 60 minutes? Note that departure times are given as integers (e.g. 6:00PM = 1800) 
+
+```{r, echo = FALSE}
+# (month = 1 OR month = 2 OR month = 4) AND (dep_time < 600 OR dep_time > 1800) AND arr_delay > 60
+# month %in% (1, 2, 4) & (dep_time < 600 | dep_time > 1800) & arr_delay > 60
+```
+---
+### The `filter()` verb
+
+Missing values in R are denoted as `NA` (not available). To filter out, or check for missing values, we use `is.na()`.
+
+```{r}
+x <- NA
+x == NA
+is.na(x)
+```
+
+---
+### Grammar for data wrangling
+
+There are five verbs for working with data in a data frame:
+
+- `select()` - take a subset of columns
+
+- `filter()` - take a subset of rows
+
+- **`mutate()` - add or modify existing columns**
+
+- `arrange()` - sort the rows
+
+- `summarize()` - aggregate the data across rows (by groups)
+
+---
+### The `mutate()` verb
+
+Let's first create a narrower data set:
+
+```{r}
+flights_sml <- select(flights, 
+  year:day, 
+  ends_with("delay"), 
+  distance, 
+  air_time
+)
+```
+---
+### The `mutate()` verb
+
+```{r}
+mutate(flights_sml,
+  gain = arr_delay - dep_delay,
+  speed = distance / air_time * 60
+)
+```
+---
+### The `mutate()` verb
+
+```{r}
+transmute(flights_sml,
+  gain = arr_delay - dep_delay,
+  hours = air_time / 60,
+  gain_per_hour = gain / hours
+)
+```
+
+---
+### Grammar for data wrangling
+
+There are five verbs for working with data in a data frame:
+
+- `select()` - take a subset of columns
+
+- `filter()` - take a subset of rows
+
+- `mutate()` - add or modify existing columns
+
+- **`arrange()` - sort the rows**
+
+- `summarize()` - aggregate the data across rows (by groups)
+
+---
+### The `arrange()` verb
+
+```{r}
+arrange(flights, month, day, dep_time)
+```
+---
+### The `arrange()` verb
+
+```{r}
+arrange(flights, desc(month), day, desc(dep_time))
+```
+
+---
+### Grammar for data wrangling
+
+There are five verbs for working with data in a data frame:
+
+- `select()` - take a subset of columns
+
+- `filter()` - take a subset of rows
+
+- `mutate()` - add or modify existing columns
+
+- `arrange()` - sort the rows
+
+- **`summarize()` - aggregate the data across rows (by groups)**
+
+---
+### The `summarize()` verb
+
+`summarize()` only makes sense if you *group by* a variable
+
+```{r}
+summarize(flights, delay = mean(dep_delay, na.rm = TRUE))
+```
+---
+### The `summarize()` verb
+
+`summarize()` only makes sense if you *group by* a variable
+
+```{r}
+by_dest <- group_by(flights, dest)
+summarise(by_dest,
+  count = n(),
+  dist = mean(distance, na.rm = TRUE),
+  delay = mean(arr_delay, na.rm = TRUE)
+)
+```
+---
+### The `summarize()` verb and the pipe
+
+```{r}
+flights %>% 
+  group_by(dest) %>% 
+  summarise(
+    count = n(),
+    dist = mean(distance, na.rm = TRUE),
+    delay = mean(arr_delay, na.rm = TRUE)
+  )
+```
+---
+### The `summarize()` verb
+
+We'll talk more about `summarize` next week when we start getting into statistics.
+---
+class: inverse, center, middle
+
+# End of Session 3.3

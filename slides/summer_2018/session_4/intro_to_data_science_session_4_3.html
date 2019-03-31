@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Data Science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Robert Clements" />
+    <link rel="stylesheet" href="rc_css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Data Science
+## Session 4.3
+### Robert Clements
+
+---
+
+
+
+### Session 4.3 Outline
+
+- Tidy data
+  + *R for Data Science - Section 12*
+  + *Modern Data Science with R - Chapter 5.1*
+- Data types &amp; structures
+  + *R for Data Science - Section 10*
+
+---
+class: inverse, center, middle
+# Tidy data
+---
+### What is tidy data?
+
+Tidy data is a consistent way to organize your data into a tabular format of rows and columns. With a little effort up front, you're data munging and wrangling will be easier and faster. 
+
+For the theory, you can read this paper: [http://www.jstatsoft.org/v59/i10/paper](http://www.jstatsoft.org/v59/i10/paper)
+---
+### Tidy data
+
+1. Each column is a variable
+2. Each row is an observation
+3. Each cell is a value
+
+![](pics/tidy-1.png)
+
+---
+### Why make data tidy?
+
+1. Keeps your work consistent.  
+2. R likes to work with vectors of values. Most R functions operate on vectors (recall the aggregation functions). Tidy data allows you to exploit this.
+
+
+```r
+library(tidyverse)
+diamonds
+```
+
+```
+## # A tibble: 53,940 x 10
+##    carat cut       color clarity depth table price     x     y     z
+##    &lt;dbl&gt; &lt;ord&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1 0.230 Ideal     E     SI2      61.5  55.0   326  3.95  3.98  2.43
+##  2 0.210 Premium   E     SI1      59.8  61.0   326  3.89  3.84  2.31
+##  3 0.230 Good      E     VS1      56.9  65.0   327  4.05  4.07  2.31
+##  4 0.290 Premium   I     VS2      62.4  58.0   334  4.20  4.23  2.63
+##  5 0.310 Good      J     SI2      63.3  58.0   335  4.34  4.35  2.75
+##  6 0.240 Very Good J     VVS2     62.8  57.0   336  3.94  3.96  2.48
+##  7 0.240 Very Good I     VVS1     62.3  57.0   336  3.95  3.98  2.47
+##  8 0.260 Very Good H     SI1      61.9  55.0   337  4.07  4.11  2.53
+##  9 0.220 Fair      E     VS2      65.1  61.0   337  3.87  3.78  2.49
+## 10 0.230 Very Good H     VS1      59.4  61.0   338  4.00  4.05  2.39
+## # ... with 53,930 more rows
+```
+
+---
+### Why make data tidy?
+
+1. Keeps your work consistent.  
+2. R likes to work with vectors of values. Most R functions operate on vectors (recall the aggregation functions). Tidy data allows you to exploit this.
+
+
+```r
+library(tidyverse)
+diamonds %&gt;% group_by(cut) %&gt;%
+  summarize(avg_price = mean(price, na.rm = TRUE))
+```
+
+```
+## # A tibble: 5 x 2
+##   cut       avg_price
+##   &lt;ord&gt;         &lt;dbl&gt;
+## 1 Fair           4359
+## 2 Good           3929
+## 3 Very Good      3982
+## 4 Premium        4584
+## 5 Ideal          3458
+```
+---
+### How can we make this tidy?
+
+This is a table of HIV prevalency for countries and years. Why would you say this data is not tidy? How can we change it so that it is?
+
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Country &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Y1979 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Y1989 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Y1999 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Y2009 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; France &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.4 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; South Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14.8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.318 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.6 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+### Excel files
+
+Often, excel files are not tidy.
+
+![](pics/excel.png)
+
+---
+class: inverse, center, middle
+# Data types &amp; structures
+---
+### Data types &amp; structures
+
+We already know these *types* of variables: 
+
+- categorical
+- ordinal
+- continuous
+
+In R, these are defined as these types:
+
+- integer (`int`) - numeric
+- double (`dbl`) - numeric 
+- character (`chr`) - strings
+- datetime (`dttm`) - time
+- factor (`fct`) - categorical variables with a set number of pre-defined levels
+- ordinal (`ord`) - ordered factor variable
+
+---
+### Data types &amp; structures
+
+We've heard of these data structures:
+
+- vectors of numbers or strings (using the concatenate function `c()`)
+- data frames
+- tibbles 
+
+But there are also these (we won't be working with these):
+
+- lists - similar to dictionaries in Python
+- matrices - just like matrices from linear algebra
+---
+### Tibbles
+
+Tibbles are different from data frames in two ways:
+
+- How they print to your screen - they only print enough data that can fit on the screen **and** they show the variable types.
+- How you can subset them
+
+---
+### Creating a tibble
+
+
+```r
+data(iris)
+class(iris)
+```
+
+```
+## [1] "data.frame"
+```
+
+```r
+iris &lt;- as_tibble(iris)
+class(iris)
+```
+
+```
+## [1] "tbl_df"     "tbl"        "data.frame"
+```
+---
+### Run this code in your console and see what happens:
+
+
+```r
+data(iris)
+iris &lt;- as.data.frame(iris)
+iris
+iris &lt;- as_tibble(iris)
+iris
+```
+---
+### Creating a tibble from scratch
+
+
+```r
+my_tbl &lt;- tibble(
+  var_one = c(1,2,3,4,5),
+  var_two = c('a', 'b', 'c', 'd', 'e'),
+  var_three = c(2.1, 1.2, 5.5, 2.8, 7.6)
+)
+my_tbl
+```
+
+```
+## # A tibble: 5 x 3
+##   var_one var_two var_three
+##     &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;
+## 1    1.00 a            2.10
+## 2    2.00 b            1.20
+## 3    3.00 c            5.50
+## 4    4.00 d            2.80
+## 5    5.00 e            7.60
+```
+---
+### Subsetting tibbles
+
+If you want to extract a single column:
+
+
+```r
+my_tbl$var_one # by name
+```
+
+```
+## [1] 1 2 3 4 5
+```
+
+```r
+my_tbl[['var_one']] # by name
+```
+
+```
+## [1] 1 2 3 4 5
+```
+
+```r
+my_tbl[[1]] # by position
+```
+
+```
+## [1] 1 2 3 4 5
+```
+
+If using the pipe, you need to use the `.` placeholder
+
+
+```r
+my_tbl %&gt;% .[['var_one']]
+```
+
+```
+## [1] 1 2 3 4 5
+```
+---
+### Subsetting tibbles
+
+If you want to extract multiple columns:
+
+Use `select()`!!!
+---
+class: inverse, center, middle
+
+# End of Session 4.3
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -1,0 +1,419 @@
+---
+title: "Introduction to Data Science"
+subtitle: "Session 6.3"
+author: "Robert Clements"
+date: ""
+output:
+  xaringan::moon_reader:
+    css: rc_css.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(fig.align = "center", fig.asp=.5, message = FALSE, warning = FALSE)
+```
+
+```{r, message = FALSE, warning=FALSE, echo = FALSE}
+library(tidyverse)
+```
+
+### Session 6.3 Outline
+
+- Fundamental statistics concepts
+  + Simpson's paradox
+- Recoding variables
+  + Factors
+  + Dates and times
+  + *R for Data Science Ch 15 & 16*
+
+---
+class: inverse, center, middle
+# Simpson's paradox
+---
+### Simpson's paradox
+
+... is when groups of data show one particular trend, but this trend is reversed when the groups are combined together.
+
+Famous example: Berkeley admissions
+
+From a study done in the 70's, we have:
+
+1. admissions data by department (A-F)
+
+2. gender of applicant
+
+3. admissions decision
+---
+### Simpson's paradox
+
+... is when groups of data show one particular trend, but this trend is reversed when the groups are combined together.
+
+
+Famous example: Berkeley admissions
+
+```{r}
+ucb_ad <- read_csv(file = 'ucb_admiss.csv')
+ucb_ad 
+```
+ 
+---
+### Simpson's paradox
+
+Here we plot the distribution of admission decisions overall **by gender**:
+
+```{r}
+ucb_ad %>% 
+  ggplot() + geom_bar(aes(x = Gender, y = Freq, fill = Admit), stat = 'identity', position = 'fill') +
+ labs(x = 'Gender', y = '', fill = 'Admission',
+       title = 'Admit by gender') +
+  theme_bw()
+```
+---
+### Simpson's paradox
+
+Here we plot the distribution of admission decisions **by gender and department**:
+
+```{r}
+ucb_ad %>% 
+  ggplot() + geom_bar(aes(x = Gender, y = Freq, fill = Admit), stat = 'identity', position = 'fill') +
+  facet_grid(~ Dept) +
+  labs(x = 'Gender', y = '', fill = 'Admission',
+       title = 'Admit by gender by department') +
+  theme_bw()
+```
+---
+### What happened?
+
+Females tend to apply for more competitive departments.
+
+Here we plot the distribution of applicants **by gender and department**:
+
+```{r}
+ucb_ad %>% 
+  ggplot() + geom_bar(aes(x = Gender, y = Freq), stat = 'identity') +
+  facet_grid(~ Dept) +
+  labs(x = 'Gender', y = '', fill = 'Admission',
+       title = 'Applicants by gender by department') +
+  theme_bw()
+```
+---
+### Recall this counterintuitive relationship
+
+What can we do to try to reveal a more intuitive relationship using a third variable? We'll save that for later...
+
+```{r}
+diamonds %>% ggplot(aes(x = cut, y = price)) +
+  geom_boxplot()
+```
+
+```{r, include = FALSE, eval = FALSE}
+diamonds_2 <- diamonds %>% mutate(carat_fct = case_when(carat < 1 ~ '<1',
+                                                        # carat >= .5 & carat < 1 ~ '<1',
+                                                        carat >= 1 & carat < 1.5 ~ '<1.5',
+                                                        carat >= 1.5 & carat < 2 ~ '<2',
+                                                        carat >=2 ~ '>2'))
+diamonds_2 %>% ggplot(aes(x = cut, y = price)) +
+  geom_boxplot() +
+  facet_grid(~carat_fct)
+```
+---
+class: inverse, center, middle
+# Recoding variables
+---
+### Recoding variables
+
+Motivation:
+
+- We know how to import/export our data (`read_***()` and `write_***()`)
+
+- We know how to tidy our data (`spread()` and `gather()`)
+
+- We know how to do aggregations (`summarize()`)
+
+- We know how to subset and create new variables (`select()`, `filter()`, and `mutate()`)
+
+- We know how to rearrange the data (`arrange()`)
+
+---
+### Recoding variables
+
+But what do we do if we want to either: 
+
+- convert from `numeric` to unordered `categorical` (`factor`),
+
+- convert from `character` to unordered `factor`,
+
+- convert from unordered `factor` to `ordinal`,
+
+- rearrange the levels of a `factor`,
+
+- recode a `categorical` variable with different categories,
+
+- or convert a `character` to a `date`.
+---
+### More about `factors`
+
+But first, what are `factors`?
+
+A `factor` is a categorical or ordinal variable with a defined set of categories, or `levels`. By default, R will order the levels of a factor in alphabetical order.
+
+```{r}
+breed <- c('collie', 'collie', 'spaniel', 
+           'poodle', 'poodle')
+breed_fct <- factor(breed)
+breed_fct
+
+levels(breed_fct)
+```
+---
+### More about `factors`
+
+R treats `factors` differently than just `character` variables by making use of `levels`. Your factor can have levels that don't always appear in your variable.
+
+```{r}
+breed_fct <- factor(breed, levels = c('collie', 'poodle', 
+                                      'spaniel', 'terrier', 
+                                      'mutt'))
+
+breed_fct
+levels(breed_fct)
+```
+---
+### More about `factors`
+
+And your variable may have values that haven't been defined as a level.
+
+```{r}
+breed_new <- c('doberman', 'collie', 'collie', 'spaniel', 
+               'poodle', 'poodle')
+breed_new_fct <- factor(breed_new, levels = c('collie', 'poodle', 
+                                              'spaniel', 'terrier', 
+                                              'mutt'))
+
+breed_new_fct
+levels(breed_new_fct)
+```
+---
+### Convert from `numeric` to `categorical`
+
+Use `case_when()` from the `dplyr` package!!
+
+`case_when()` takes a series of two-sided formulas, where:
+
+- left hand side is a logical expression
+
+- right hand side gives the value
+
+Example:
+
+```{r}
+x <- 1:10
+x
+x_cat <- case_when(x < 3 ~ '<3',
+                   x >= 3 & x < 6 ~ '3<=x<6',
+                   x >= 6 ~ '>6')
+```
+---
+### Convert from `numeric` to `categorical`
+
+Use `case_when()` from the `dplyr` package!!
+
+`case_when()` takes a series of two-sided formulas, where:
+
+- left hand side is a logical expression
+
+- right hand side gives the value
+
+Example:
+
+```{r}
+x_cat
+class(x_cat)
+```
+---
+### Convert from `character` to unordered `factor`
+
+`character` variables are **not** factors yet.
+
+```{r}
+class(x_cat)
+
+x_fct <- factor(x_cat)
+class(x_fct)
+x_fct
+```
+---
+### Convert from unordered `factor` to ordered `factor`
+
+If you want ordinal variables, you have to be explicit
+
+```{r}
+class(x_fct)
+
+x_fct <- factor(x_fct, ordered = TRUE)
+class(x_fct)
+x_fct
+```
+---
+### Rearrange the levels of a `factor`
+
+Use the `fct_relevel()` function from the `forcats` package (from the `tidyverse`)!!
+
+`forcats` provides a whole bunch of convenience functions for dealing with `factors`.
+
+```{r}
+x_fct <- factor(x_fct, ordered = TRUE)
+x_fct
+levels(x_fct)
+```
+---
+### Rearrange the levels of a `factor`
+
+Use the `fct_relevel()` function from the `forcats` package (from the `tidyverse`)!!
+
+```{r}
+x_fct
+
+x_fct <- fct_relevel(x_fct, '<3', '3<=x<6', '>6')
+
+levels(x_fct)
+```
+---
+### Pop Quiz?
+
+Dealing with factors this way comes in handy during EDA and when building models with categorical variables. Why?
+
+
+---
+### Recode a `categorical` variable with different categories
+
+Use `fct_recode()`
+
+```{r}
+x_fct_re <- fct_recode(x_fct,  'less than 3' = '<3',
+                       'between 3 and 6' = '3<=x<6',
+                       'other' = '>6')
+x_fct_re
+```
+---
+### Recode a `categorical` variable with different categories
+
+We can also collapse categories with `fct_collapse()`
+
+```{r}
+x_fct_coll <- fct_collapse(x_fct, 'less than 3' = '<3',
+                           'other' = c('3<=x<6', '>6'))
+x_fct_coll
+```
+
+---
+### Convert a `character` to a `date`
+
+Dealing with dates can be a pain. Luckily, we can use the `lubridate` package.
+
+
+Useful functions:
+
+- `ymd()`, `ymd_hms()`, `dmy()`, `dmy_hms()`, `mdy()`: for parsing date-times
+
+- `year()`, `month()`, `mday()`, `hour()`, `minute()`, `second()`: for extracting or setting components
+
+- `with_tz()`, `force_tz()`: for dealing with time zones
+
+---
+### Convert a `character` to a `date`
+
+Define a new character variable consisting of a date in a usual date format (ex. mm/dd/yyyy, yyyy-mm-dd, etc.)
+
+
+```{r}
+birthday <- c('6/16/1915') # John Tukey's birthday
+birthday
+class(birthday)
+```
+---
+### Convert a `character` to a `date`
+
+Parsing dates
+
+```{r, message=FALSE, warning=FALSE}
+library(lubridate)
+birthday
+birthday <- mdy(birthday)
+birthday
+class(birthday)
+```
+---
+### Convert a `character` to a `date`
+
+Parsing dates
+
+```{r, message=FALSE, warning=FALSE}
+birthday <- '1915-06-16 12:22:21.01'
+birthday <- ymd_hms(birthday)
+birthday
+class(birthday)
+```
+---
+### Convert a `character` to a `date`
+
+Extracting and setting components
+
+```{r, message=FALSE, warning=FALSE}
+birthday
+
+year(birthday)
+hour(birthday) <- 5
+birthday
+```
+---
+### Convert a `character` to a `date`
+
+Printing or changing time zones
+
+Note: you can check `olson_time_zones()` for a list of time zones
+
+```{r}
+# Changes the time to the new time zone
+with_tz(birthday, tzone = "America/Chicago")
+
+# Keeps the time, but changes the time zone
+force_tz(birthday, tzone = "America/Chicago")
+```
+---
+### Pop Quiz
+
+1. Enter your birthday into R, convert it to a Date object, and find the day of the week you were born using `weekdays()`.
+
+2. How many days old are you? (Hint: use `Sys.Date()` to get today's date)
+---
+### If we have time, let's work on this problem...
+
+What can we do to try to reveal a more intuitive relationship using a third variable? 
+
+```{r}
+diamonds %>% ggplot(aes(x = cut, y = price)) +
+  geom_boxplot()
+```
+
+```{r, include = FALSE, eval = FALSE}
+diamonds_2 <- diamonds %>% mutate(carat_fct = case_when(carat < 1 ~ '<1',
+                                                        # carat >= .5 & carat < 1 ~ '<1',
+                                                        carat >= 1 & carat < 1.5 ~ '<1.5',
+                                                        carat >= 1.5 & carat < 2 ~ '<2',
+                                                        carat >=2 ~ '>2'))
+diamonds_2 %>% ggplot(aes(x = cut, y = price)) +
+  geom_boxplot() +
+  facet_grid(~carat_fct)
+```
+---
+class: inverse, center, middle
+
+# End of Session 6.3

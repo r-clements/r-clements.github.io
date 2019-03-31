@@ -1,0 +1,271 @@
+---
+title: "Introduction to Data Science"
+subtitle: "Session 10.1"
+author: "Robert Clements"
+date: ""
+output:
+  xaringan::moon_reader:
+    css: rc_css.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(fig.align = "center", fig.asp=.5, message = FALSE, warning = FALSE)
+```
+### Final announcements
+
+- Final homework is due by Friday April 5th at noon
+  + you can email it to me if Canvas won't let you upload it
+
+- Canvas may cut off your access within a week after the end of class
+  + I will leave you enough time to download assignments, solutions, and lecture materials today
+  + I will email you all the solution for the final
+  + I will email you all the reading list (also available on Canvas in this week's module)
+
+---
+### Session 10.1 Outline
+
+- AI, machine learning, deep learning
+- Citizen data science and automation
+- Solutions and solution deployment
+- NLP topics
+
+---
+class: inverse, center, middle
+# AI, machine learning, and deep learning
+---
+### What's the difference?
+
+You can think of AI, machine learning, and deep learning like nested Russian dolls:
+
+- Deep learning is a subset of...
+- machine learning, which is a subset of...
+- AI
+
+.center[![](pics/russian.jpg)]
+---
+### AI
+
+*It is the science and engineering of making intelligent machines, especially intelligent computer programs. * - John McCarthy
+
+.center[![](pics/johnmccarthy.jpg)]
+---
+### Machine learning
+
+- Algorithms that attempt to minimize error or maximize likelihood
+
+- Not explicitly programmed - they adjust based on the data they are fed
+
+- We've already seen some examples: regression, decision trees, random forests, etc.
+
+.center[![](pics/ml.svg)]
+---
+### Deep learning
+
+- an ML algorithm - a type of artificial neural network with > 1 hidden layers
+- setting records in performance for image and sound recognition, recommender systems, etc.
+- computationally expensive (GPU's are helpful) and requires a lot of data
+
+.center[![](pics/dl.jpg)]
+---
+class: inverse, center, middle
+# Citizen data science and automation
+---
+### Automation
+
+- Many companies are promising automated AI (or machine learning)
+- [DataRobot](https://www.datarobot.com/) and [H2O](https://www.h2o.ai/driverless-ai/) are two of the most noteable
+
+.pull-left[
+![](pics/datarobot.png)
+]
+.pull-right[
+![](pics/driverless.png)
+]
+---
+### Is automation a threat to Data Scientists?
+
+- Most likely not. As we've seen in class, machine learning is a very small piece of the whole data science workflow - automating it will only make the data scientist's job easier
+
+- Not all data science requires a machine learning solution
+
+- Not all data science requires the type of machine learning solution that these companies can provide
+  + Machine learning is constantly evolving
+  
+- Many tasks before and after *doing* machine learning needs a data scientist to do it
+
+---
+class: inverse, center, middle
+# Solution deployment
+---
+### Solutions
+
+The type of solution that you need is project-specific, but may consist of one of these:
+
+- Dashboards
+
+- Insights and inference
+
+- Predictive models 
+
+---
+### Solution deployment
+
+- **Dashboards**
+
+- Insights and inference
+
+- Predictive models 
+---
+### Deploying dashboards
+
+.center[![](pics/tableau.png)]
+.center[![](pics/spotfire.png)]
+.center[![](pics/shiny.png)]
+
+---
+### Solution deployment
+
+- Dashboards
+
+- **Insights and inference**
+
+- Predictive models  
+---
+### Insights 
+
+Often these are not really deployed, but simply reported on.
+
+*Example: on a project, I used some interactive visualizations to reveal that one specific airline (United) was sending almost all of their jet engines into the shop to get a specific type of maintenance done. That particular maintenance is only required for engines that are exposed to a lot of dust and dirt on their flight path (think middle east desert). United was costing our company a lot of money by doing this.*
+---
+### Solution deployment
+
+- Dashboards
+
+- Insights and inference
+
+- **Predictive models** 
+---
+### Deploying predictive models
+
+Company-specific. In my experiences there are two main approaches:
+
+- the hand-off approach
+
+- the platform approach (new)
+---
+### The hand-off approach
+
+Your solution is handed off to an engineer to convert your model into the company's language of choice (could be Java, could be .NET, etc.)
+
+Three personal examples:
+
+*I once had a model that was deployed completely in SQL. The features were created and the model predictions were made by using SQL queries only. The model itself was a linear model, so this can be very simple to code up in SQL.*
+---
+### The hand-off approach
+
+I have a deployed model right now that is structured like so:
+
+- 4 Hive query scripts
+- One shell script
+
+The shell script gets run automatically every day, and it 
+
+- calls each of the Hive scripts in sequence
+  + the Hive queries create features and get the predictions from a linear model which is easily coded up since Hive is a SQL-like language
+  
+- stores the results in a Hive table
+
+- sends an email when it's done
+
+---
+### The hand-off approach
+
+I have another deployed model right now that is structured like so:
+
+- 1 Spark script
+- 1 R script
+- 1 saved H2O model object (a random forest)
+- One shell script
+
+The shell script gets run automatically, and it:
+
+- runs the spark script 
+  + which pulls data and creates features
+
+- runs the R script
+  + which loads the features and the H2O model
+  + gets predictions from the H2O model
+  + saves those predictions in a flat file
+  
+- sends the flat file to the business to review
+---
+### The platform approach
+
+Platforms come with the promise that you can do all of your analysis, and instantly deploy your solution as an API with the click of a button.
+
+Build your own, or go third party. There are lots of companies getting in this game:
+
+- [DATASCIENCE.COM](https://www.datascience.com/)
+- [yhat](https://www.yhat.com/)
+- [Google cloud](https://cloud.google.com/)
+- [Microsoft Azure](https://azure.microsoft.com/en-us/?v=18.12)
+- [AWS](https://aws.amazon.com/?nc2=h_lg)
+- [Domino Data Labs](https://www.dominodatalab.com/)
+- many, many more...
+---
+class: inverse, center, middle
+# NLP
+---
+### What is Natural Language Processing?
+
+“Apart from common word processor operations that treat text like a mere sequence of symbols, NLP considers the hierarchical structure of language: several words make a phrase, several phrases make a sentence and, ultimately, sentences convey ideas...By analyzing language for its meaning, NLP systems have long filled useful roles, such as correcting grammar, converting speech to text and automatically translating between languages.” - John Rehling, an NLP expert at Meltwater Group, *How Natural Language Processing Helps Uncover Social Media Sentiment*
+---
+### NLP
+
+NLP is a field in (Computer/Data/Linguistics/AI-science) that hopes to teach (program) computer to extract meaning from human language, which is rarely structured or plainly spoken.
+
+---
+### Why NLP?
+
+- Summarize text to extract important ideas
+
+- Create a chat bot
+
+- Auto-tagging content
+
+- Entity recognition - identify the type of entity (person, place, things)
+
+- Sentiment analysis - identify the sentiment of text (positive, negative, angry, etc.)
+
+- Tokenizing - reducing words to their root
+
+---
+### NLP Examples
+
+.pull-left[
+- Auto-complete in Google
+
+- Grammar and spelling correction in Word
+
+- Search 
+
+- Email classification (not just SPAM anymore)
+
+- And the dreaded Word Cloud!
+]
+
+.pull-right[
+![](pics/wordcloud.jpg)
+]
+---
+class: inverse, center, middle
+
+# End of Session 10.1

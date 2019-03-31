@@ -1,0 +1,194 @@
+---
+title: "Introduction to Data Science"
+subtitle: "Session 8.3"
+author: "Robert Clements"
+date: ""
+output:
+  xaringan::moon_reader:
+    css: rc_css.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(fig.align = "center", fig.asp=.5, message = FALSE, warning = FALSE)
+```
+
+### Session 8.3 Outline
+
+- Time Series Data
+---
+class: inverse, center, middle
+# Time Series Data
+---
+### Why time series data?
+
+Many business use cases:
+
+- Explaining seasonal patterns in sales
+
+- Predicting the expected number of incoming or churning customers
+
+- Estimating the effect of a newly launched product on number of sold units
+
+- Detecting unusual events and estimating the magnitude of their effect
+---
+### Why time series data?
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+library(tidyverse)
+library(tseries)
+daily_data <- read_csv('../../demos/session_8/day.csv')
+
+daily_data$Date = as.Date(daily_data$dteday)
+
+ggplot(daily_data, aes(Date, cnt)) + geom_line() + scale_x_date('month')  + ylab("Daily Bike Checkouts") +
+            xlab("")
+```
+---
+### Bike data
+
+First, let's install a package: `forecast` for time series modeling.
+Next, download the bike data (`day.csv`) and load it into `R`.
+
+```{r, eval = FALSE}
+library(forecast)
+library(tidyverse)
+library(tseries)
+
+daily_data <- read_csv('path/to/day.csv')
+```
+---
+### Bike data
+
+```{r}
+glimpse(daily_data)
+```
+---
+### EDA
+
+Let's convert the `dteday` column to a Date object and plot the time series for the number of bikes checked out per day.
+
+```{r, echo = TRUE, warning=FALSE, message=FALSE}
+daily_data$Date = as.Date(daily_data$dteday)
+
+ggplot(daily_data, aes(Date, cnt)) + 
+  geom_line() + 
+  ylab("Daily Bike Checkouts") +
+  xlab("") +
+  theme_bw()
+```
+---
+### EDA
+
+What do we see as far as:
+
+- trend
+- seasonality
+- volatility?
+
+Do these make sense?
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+ggplot(daily_data, aes(Date, cnt)) + 
+  geom_line() + 
+  ylab("Daily Bike Checkouts") +
+  xlab("") +
+  theme_bw()
+```
+---
+### Let's clean it up a little
+
+We can remove outliers with the `tsclean()` function.
+
+```{r}
+count_ts = ts(daily_data %>% select(cnt)) 
+
+daily_data <- daily_data %>% mutate(clean_cnt = tsclean(count_ts))
+
+ggplot() +
+  geom_line(data = daily_data, aes(x = Date, y = clean_cnt)) + 
+  ylab('Cleaned Bicycle Count') +
+  theme_bw()
+```
+---
+### The Moving Average
+
+A simple way of smoothing out a time series is to look at the moving average, i.e. the average value inside a moving window of some length of time.
+
+$$\Huge MA = \frac{1}{m}\sum_{i=-k}^{k} y_{t+i}$$
+
+where $\huge k$ is half of the size of the time window.
+---
+### The Moving Average
+
+We can use the `ma()` function from the `forecast` package.
+
+```{r}
+daily_data <- daily_data %>% mutate(cnt_ma7 = ma(clean_cnt, order = 7),
+                                    cnt_ma30 = ma(clean_cnt, order = 30))
+
+daily_data %>% select(cnt, cnt_ma7, cnt_ma30)
+```
+---
+### The Moving Average
+
+```{r}
+ggplot(data = daily_data) +
+  geom_line(aes(x = Date, y = clean_cnt, colour = "Counts")) +
+  geom_line(aes(x = Date, y = cnt_ma7,   colour = "Weekly Moving Average"))  +
+  geom_line(aes(x = Date, y = cnt_ma30, colour = "Monthly Moving Average"))  +
+  ylab('Bicycle Count') +
+  theme_bw()
+```
+---
+### Time Series Decomposition
+
+We often break a time series down by its
+
+- trend: the overall pattern of the series (increasing, decreasing, non-seasonal cycles)
+- seasonality: fluctuations over the calendar cycle
+- error/residual: everything else
+
+$$\Huge Y_t = S_t + T_t + E_t$$
+---
+### Time Series Decomposition
+
+We can use the `stl()` function in base R to do this.
+
+```{r, fig.asp = .6}
+# Convert to time series object
+# frequency is number of observations/time unit
+count_ma <- ts(na.omit(daily_data$cnt_ma30), frequency=30)
+
+# decompose
+decomp <- stl(count_ma, s.window="periodic")
+
+plot(decomp)
+```
+---
+### Question for you
+
+Why do we even care about decomposing the time series? Why don't we just use linear regression to forecast new values using some features, and ignore time?
+---
+### Dynamic Time Series Plots
+
+We can use the `dygraphs` R package to create interactive time series plots. The package provides functions that are wrappers around the dygraphs javascript library.
+
+```{r}
+library(dygraphs)
+dygraph(data = daily_data$clean_cnt,
+        xlab = 'Day',
+        ylab = 'Bicycle Count')
+```
+---
+class: inverse, center, middle
+
+# End of Session 8.3

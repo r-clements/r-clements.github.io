@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to Data Science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Robert Clements" />
+    <link rel="stylesheet" href="rc_css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Data Science
+## Session 1.3
+### Robert Clements
+
+---
+
+
+
+
+### Session 1.3 Outline
+
+- The Data Science Lifecycle
+
+- Best Practices 
+  
+---
+class: inverse, center, middle
+
+# The Data Science Lifecycle
+
+---
+.pull-left[
+### In a perfect world, data science projects would look like this:
+
+1. You have a brilliant idea to solve an important problem!
+
+2. You easily find perfectly clean data to help you solve it, in a tabular format.
+
+3. You spend most of your time analysing and fine tuning your favorite models until it's perfect.
+
+4. Your company takes your results and saves millions of dollars!!
+
+5. Everybody thinks you're a rockstar.
+]
+
+---
+.pull-left[
+### In a perfect world, data science projects would look like this:
+
+1. You have a brilliant idea to solve an important problem!
+
+2. You easily find perfectly clean data to help you solve it, in a tabular format.
+
+3. You spend most of your time analysing and fine tuning your favorite models until it's perfect.
+
+4. Your company takes your results and saves millions of dollars!!
+
+5. Everybody thinks you're a rockstar.
+]
+.pull-right[
+### In the real world, they look like this:
+
+1. Somebody you don't know has a vague idea of a problem.
+
+2. You spend 3 months hunting down and cleaning data.
+
+3. You spend 1-2 weeks tuning models to rush out your results.
+
+4. Your company praises your work and either:
+  + It is swiftly forgotten
+  + It gets deployed but company struggles to act on it
+
+5. Only your boss and teammates know who you are.
+]
+
+---
+class: inverse, middle, center
+![](https://whatsthebigdata.files.wordpress.com/2015/10/datascience-cartoon.png)
+
+---
+![](pics/lifecycle.png)
+[https://docs.microsoft.com/en-us/azure/machine-learning/team-data-science-process/lifecycle](https://docs.microsoft.com/en-us/azure/machine-learning/team-data-science-process/lifecycle)
+
+---
+### Lifecycle
+
+- Business Understanding and Problem Formulation
+  + Work with the business to define the problem
+  + Identify the data that can solve the problem
+  + Assign roles
+
+--
+
+- Data Collection, Data Understanding
+  + Find the data and collect
+  + Find SME's 
+  + Data understanding and cleaning
+
+--
+
+- Exploratory Data Analysis, Visualization
+  + Explore, clean and visualize data
+
+--
+
+- Model Training/Analytics
+  + Create features and labels/target/event
+  + Create final data sets (train/test/validation)
+  + Find insights/train models
+
+ 
+---
+### Lifecycle
+
+- Deployment
+  + Real-time or batch
+  + Dashboard or API
+
+--
+
+- User Acceptance
+  + Business takes results and acts on them
+
+--
+
+- Value and Impact Analysis
+  + Periodically assess model's impact
+  + Fingers crossed for big $$$ 
+
+--
+
+- Model Performance Tracking
+  + Track model over time
+
+--
+
+- Model Retraining and Redeployment
+  + When model deteriorates, retrain and deploy
+
+---
+[https://www.forbes.com/sites/gilpress/2016/03/23/data-preparation-most-time-consuming-least-enjoyable-data-science-task-survey-says/#52c7641c6f63](https://www.forbes.com/sites/gilpress/2016/03/23/data-preparation-most-time-consuming-least-enjoyable-data-science-task-survey-says/#52c7641c6f63)
+![](pics/lifecycle_times.jpg)
+
+![](pics/lifecycle_enjoy.jpg)
+
+
+---
+class: inverse, center, middle
+
+# Best Practices
+
+---
+### Data science best practices
+
+1. Stay organized:
+  + project timelines;
+  + roles;
+  + files and folder structure. I like [Microsoft's](https://github.com/Azure/Azure-TDSP-ProjectTemplate).
+
+--
+  
+2. Document your work: 
+  + your code; 
+  + your analyses.
+
+--
+
+3. Keep track of your code:
+  + version control.
+
+--
+
+4. Make your work reproducible:
+  + code;
+  + data;
+  + documentation.
+
+---
+### Data science best practices
+
+1. Stay organized:
+  + project timelines;
+  + roles;
+  + files and folder structure. I like [Microsoft's](https://github.com/Azure/Azure-TDSP-ProjectTemplate).
+  
+2. Document your work: 
+  + your code; **comment your code**
+  + your analyses. **RStudio notebooks/R Markdown**
+
+3. Keep track of your code:
+  + version control. **git and Github**
+
+4. Make your work reproducible: **RStudio notebooks/R Markdown**
+  + code;
+  + data;
+  + documentation.
+
+---
+### Data science best practices
+
+5. Keep yourself honest
+  + Tempting to only report *good* results
+  + Tempting to *tweak* results to match expectations
+  + Difficult to tell the boss "no"
+
+--
+
+6. Think about User Experience
+  + Make smart and *pretty* visuals
+  + Make easy-to-read visuals
+  + Make easy-to-use apps
+
+--
+
+7. Communication
+  + Tell a story with your analysis
+  + Words: use more in your technical documents; use less in your slides
+  + Most people aren't technical, don't try to sound smart
+
+--
+  
+8. KISS it
+  + Not everything needs a deep learning model
+---
+class: inverse, center, middle
+
+# End of Session 1.3
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
