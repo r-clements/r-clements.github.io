@@ -1,12 +1,5 @@
 github_users:
-  - torvalds
-  - alshedivat
+  - r-clements
 
 github_repos:
-  - alshedivat/al-folio
-  - twbs/bootstrap
-  - jekyll/jekyll
-  - jquery/jquery
-  - FortAwesome/Font-Awesome
-  - jpswalsh/academicons
-  - mathjax/MathJax
+  - r-clements/r-clements.github.io
