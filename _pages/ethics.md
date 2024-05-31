@@ -1,8 +1,8 @@
 ---
 layout: page
 permalink: /ethics/
-title: ethics
-description: AI and data ethics materials
+title: ai/data ethics
+description: 
 nav: true
 nav_order: 6
 ---
@@ -11,25 +11,25 @@ I am the current director of the [Center for AI and Data Ethics](https://www.usf
 
 ## Case Studies 
 
-In the past I've worked with undergraduate students on creating these case studies:
+In the past I've worked with undergraduate students on creating this set of case studies for any AI/Data Ethics course. They are suitable for both non-technical and technical audiences. The goal of the case studies project is to expand these case studies to include technical exercises for STEM students and discussion questions for law students.
 
-Facial Recognition for Policing: Real-life Negative Consequences of Biased Algorithms
-Themes: Algorithmic bias and fairness; privacy
+[Facial Recognition for Policing: Real-life Negative Consequences of Biased Algorithms](/assets/pdfs/facial_recognition_case_study.pdf){:target="_blank"}  
+**Themes:** Algorithmic bias and fairness; privacy
 
-Voice Assistants and Biometric Data: Amazon's Violations of Children's Privacy Rights
-Themes: Privacy and data security
+[Voice Assistants and Biometric Data: Amazon's Violations of Children's Privacy Rights](/assets/pdfs/voice_assistants_case_study.pdf){:target="_blank"}  
+**Themes:** Privacy and data security
 
-Racial Bias in Healthcare Data Solutions: Perpetuating Disparities in Medical Treatment Nationwide
-Themes: Algorithmic bias and fairness; social impact
+[Racial Bias in Healthcare Data Solutions: Perpetuating Disparities in Medical Treatment Nationwide](/assets/pdfs/racial_bias_healthcare_case_study.pdf){:target="_blank"}  
+**Themes:** Algorithmic bias and fairness; social impact
 
-Failures of LLM-Generated Text Detection: False Positives Dilute the Efficacy of AI Detection
-Themes: Academic integrity and truth
+[Failures of LLM-Generated Text Detection: False Positives Dilute the Efficacy of AI Detection](/assets/pdfs/ai_detection_case_study.pdf){:target="_blank"}  
+**Themes:** Academic integrity and truth
 
-When Noone is Driving: Navigating Accountability via Cruise's Driverless Vehicles
-Themes: Transparency and explainable AI; automation; future of work
+[When Noone is Driving: Navigating Accountability via Cruise's Driverless Vehicles](/assets/pdfs/driverless_cars_case_study.pdf){:target="_blank"}  
+**Themes:** Transparency and explainable AI; automation; future of work
 
-AI Art: Assistants, Replacements and Grifters
-Themes: Future of work; copyright and intellectual property
+[AI Art: Assistants, Replacements and Grifters](/assets/pdfs/ai_art_case_study.pdf){:target="_blank"}  
+**Themes:** Future of work; copyright and intellectual property
 
 ## Reading List
 
