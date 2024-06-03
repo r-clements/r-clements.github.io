@@ -182,7 +182,7 @@ GEM
 PLATFORMS
   aarch64-linux-gnu
   x86_64-linux-gnu
-
+  
 DEPENDENCIES
   classifier-reborn
   css_parser

@@ -4,7 +4,7 @@ permalink: /ethics/
 title: ai/data ethics
 description: 
 nav: true
-nav_order: 6
+nav_order: 2
 ---
 
 I am the current director of the [Center for AI and Data Ethics](https://www.usfca.edu/data-institute/centers-initiatives/caide) at University of San Francisco, where we work on creating educational resources and content for AI and data ethics issues, partner with organizations on practicum projects that have an ethics component, and offer ethics courses related to AI and data science. 
@@ -13,22 +13,22 @@ I am the current director of the [Center for AI and Data Ethics](https://www.usf
 
 In the past I've worked with undergraduate students on creating this set of case studies for any AI/Data Ethics course. They are suitable for both non-technical and technical audiences. The goal of the case studies project is to expand these case studies to include technical exercises for STEM students and discussion questions for law students.
 
-[Facial Recognition for Policing: Real-life Negative Consequences of Biased Algorithms](/assets/pdfs/facial_recognition_case_study.pdf){:target="_blank"}  
+[Facial Recognition for Policing: Real-life Negative Consequences of Biased Algorithms](/assets/pdf/facial_recognition_case_study.pdf){:target="_blank"}  
 **Themes:** Algorithmic bias and fairness; privacy
 
-[Voice Assistants and Biometric Data: Amazon's Violations of Children's Privacy Rights](/assets/pdfs/voice_assistants_case_study.pdf){:target="_blank"}  
+[Voice Assistants and Biometric Data: Amazon's Violations of Children's Privacy Rights](/assets/pdf/voice_assistants_case_study.pdf){:target="_blank"}  
 **Themes:** Privacy and data security
 
-[Racial Bias in Healthcare Data Solutions: Perpetuating Disparities in Medical Treatment Nationwide](/assets/pdfs/racial_bias_healthcare_case_study.pdf){:target="_blank"}  
+[Racial Bias in Healthcare Data Solutions: Perpetuating Disparities in Medical Treatment Nationwide](/assets/pdf/racial_bias_healthcare_case_study.pdf){:target="_blank"}  
 **Themes:** Algorithmic bias and fairness; social impact
 
-[Failures of LLM-Generated Text Detection: False Positives Dilute the Efficacy of AI Detection](/assets/pdfs/ai_detection_case_study.pdf){:target="_blank"}  
+[Failures of LLM-Generated Text Detection: False Positives Dilute the Efficacy of AI Detection](/assets/pdf/ai_detection_case_study.pdf){:target="_blank"}  
 **Themes:** Academic integrity and truth
 
-[When Noone is Driving: Navigating Accountability via Cruise's Driverless Vehicles](/assets/pdfs/driverless_cars_case_study.pdf){:target="_blank"}  
+[When Noone is Driving: Navigating Accountability via Cruise's Driverless Vehicles](/assets/pdf/driverless_cars_case_study.pdf){:target="_blank"}  
 **Themes:** Transparency and explainable AI; automation; future of work
 
-[AI Art: Assistants, Replacements and Grifters](/assets/pdfs/ai_art_case_study.pdf){:target="_blank"}  
+[AI Art: Assistants, Replacements and Grifters](/assets/pdf/ai_art_case_study.pdf){:target="_blank"}  
 **Themes:** Future of work; copyright and intellectual property
 
 ## Reading List
