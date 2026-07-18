@@ -2,11 +2,19 @@
 layout: page
 permalink: /teaching/
 title: teaching
-description: Materials for courses you taught. Replace this text with your description.
-nav: false
+description: Courses taught in the MS in Data Science and AI (DSAI) program at USF.
+nav: true
 nav_order: 6
 ---
 
-For now, this page is assumed to be a static description of your courses. You can convert it to a collection similar to `_projects/` so that you can have a dedicated page for each course.
+## 2026-2027
 
-Organize your courses by years, topics, or universities, however you like!
+**DSAI 601 - Linear Regression Analysis**
+
+**DSAI 621 - Intro to Machine Learning**
+
+**DSAI 630 - Advanced Machine Learning**
+
+### Course materials
+
+[Linear Regression apps](https://robertclements.org/dsai601-regression-f26/){:target="_blank"} — interactive apps for DSAI 601.
