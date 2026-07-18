@@ -17,7 +17,7 @@ selected_papers: false # includes a list of papers marked as "selected={true}"
 social: true # includes social icons at the bottom of the page
 ---
 
-I'm an Assistant Professor in Data Science at the University of San Francisco (USF). Specifically, I am part of the Master of Science in Data Science (MSDS) program and teach courses in Machine Learning, Probability & Statistics, MLOps, and Ethics.
+I'm an Assistant Professor in Data Science at the University of San Francisco (USF). Specifically, I am part of the Master of Science in Data Science and AI (DSAI) program and teach courses in Machine Learning, Probability & Statistics, MLOps, and Ethics.
 
 I recently returned to academia after a nearly 10 year career in industry as a Data Scientist and Data Science Manager/Director/Sr Director across multiple companies in the San Francisco Bay Area. While my time in industry was fun and educational, I was always happier in academia and I have found my new career to be particularly rewarding. 
 
