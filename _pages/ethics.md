@@ -14,23 +14,25 @@ I am the current director of the [Center for AI and Data Ethics](https://www.usf
 In the past I've worked with undergraduate students on creating this set of case studies for any AI/Data Ethics course. They are suitable for both non-technical and technical audiences. The goal of the case studies project is to expand these case studies to include technical exercises for STEM students and discussion questions for law students.
 
 [Facial Recognition for Policing: Real-life Negative Consequences of Biased Algorithms](/assets/pdf/facial_recognition_case_study.pdf){:target="_blank"}  
-**Themes:** Algorithmic bias and fairness; privacy
+**Themes:** Algorithmic bias and fairness; privacy  
+**Authors:** Hadley Dixon, Robert Clements
 
 [Voice Assistants and Biometric Data: Amazon's Violations of Children's Privacy Rights](/assets/pdf/voice_assistants_case_study.pdf){:target="_blank"}  
-**Themes:** Privacy and data security
+**Themes:** Privacy and data security  
+**Authors:** Hadley Dixon, Robert Clements
 
 [Racial Bias in Healthcare Data Solutions: Perpetuating Disparities in Medical Treatment Nationwide](/assets/pdf/racial_bias_healthcare_case_study.pdf){:target="_blank"}  
-**Themes:** Algorithmic bias and fairness; social impact
+**Themes:** Algorithmic bias and fairness; social impact  
+**Authors:** Hadley Dixon, Robert Clements
 
 [Failures of LLM-Generated Text Detection: False Positives Dilute the Efficacy of AI Detection](/assets/pdf/ai_detection_case_study.pdf){:target="_blank"}  
-**Themes:** Academic integrity and truth
+**Themes:** Academic integrity and truth  
+**Authors:** Hadley Dixon, Robert Clements
 
 [When Noone is Driving: Navigating Accountability via Cruise's Driverless Vehicles](/assets/pdf/driverless_cars_case_study.pdf){:target="_blank"}  
-**Themes:** Transparency and explainable AI; automation; future of work
+**Themes:** Transparency and explainable AI; automation; future of work  
+**Authors:** Hadley Dixon, Robert Clements
 
 [AI Art: Assistants, Replacements and Grifters](/assets/pdf/ai_art_case_study.pdf){:target="_blank"}  
-**Themes:** Future of work; copyright and intellectual property
-
-## Reading List
-
-I also maintain [this short reading list](https://docs.google.com/spreadsheets/d/10jt4nJU6vMmixG5LCd3Cw7AJ0TDd0yYEbY-MSnh-Ndc/edit?usp=drive_link) for our MSDS Ethics in Data Science course.
+**Themes:** Future of work; copyright and intellectual property  
+**Authors:** Hadley Dixon, Robert Clements
