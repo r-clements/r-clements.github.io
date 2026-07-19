@@ -4,7 +4,24 @@
     {
       "name": "jekyll-docker",
       "runtimeExecutable": "docker",
-      "runtimeArgs": ["compose", "up"],
+      "runtimeArgs": [
+        "run",
+        "--rm",
+        "--name",
+        "jekyll-live-preview",
+        "-v",
+        "/Users/rclements/Documents/projects/r-clements.github.io:/srv/jekyll",
+        "-w",
+        "/srv/jekyll",
+        "-p",
+        "8080:8080",
+        "-p",
+        "35729:35729",
+        "jekyll/jekyll:latest",
+        "sh",
+        "-c",
+        "bundle install && bundle exec jekyll serve --host 0.0.0.0 --port 8080 --livereload --livereload_port 35729"
+      ],
       "port": 8080
     }
   ]

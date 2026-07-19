@@ -6,6 +6,7 @@ body {
   padding-bottom: 70px;
   color: var(--global-text-color);
   background-color: var(--global-bg-color);
+  font-family: "Inter", sans-serif;
 
   h1,
   h2,
@@ -14,6 +15,8 @@ body {
   h5,
   h6 {
     scroll-margin-top: 66px;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
   }
 }
 
